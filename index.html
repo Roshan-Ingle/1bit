@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1bit.sbs | Parent Node</title>
+    <style>
+        /* Space Grotesk is a perfect geometric font for neobrutalism */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #141414;
+            --border-color: #ffffff;
+            --accent-color: #D4FF00; /* Harsh neon lime */
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            /* Raw grid background */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            ::selection { background: var(--accent-color); color: #000; }
+        }
+
+        /* Neobrutalist Center-Aligned Card */
+        .card {
+            background-color: var(--card-bg);
+            border: 4px solid var(--border-color);
+            /* Hard, solid shadow instead of a soft blur */
+            box-shadow: 12px 12px 0px var(--accent-color);
+            padding: 3rem 2rem;
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Stark Status Badge */
+        .status-badge {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #000000;
+            border: 2px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+        }
+
+        .domain {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 2.5rem;
+            max-width: 80%;
+        }
+
+        /* Thick Harsh Divider */
+        .divider {
+            width: 100%;
+            height: 4px;
+            background-color: var(--border-color);
+            margin-bottom: 2.5rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .email {
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        /* Neobrutalist highlight hover on email */
+        .email::after {
+            content: '';
+            position: absolute;
+            left: -5px;
+            bottom: 0;
+            width: calc(100% + 10px);
+            height: 8px;
+            background-color: var(--accent-color);
+            z-index: -1;
+            transition: height 0.2s;
+        }
+
+        .email:hover {
+            color: #000;
+        }
+
+        .email:hover::after {
+            height: 100%;
+        }
+
+        /* Big Chunky Support Button */
+        .support-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 3px solid var(--border-color);
+            box-shadow: 6px 6px 0px var(--accent-color);
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.1s ease-in-out;
+        }
+
+        .support-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* The physical "button click" effect */
+        .support-btn:hover {
+            background-color: var(--accent-color);
+            color: #000000;
+        }
+
+        .support-btn:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0px 0px 0px var(--accent-color);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .card {
+                padding: 2.5rem 1.5rem;
+                box-shadow: 8px 8px 0px var(--accent-color);
+            }
+            .domain { font-size: 2.5rem; }
+            .tagline { max-width: 100%; }
+            .support-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- Stark Badge -->
+        <div class="status-badge">
+            Parent Domain
+        </div>
+
+        <!-- Main Heading -->
+        <h1 class="domain">1bit.sbs</h1>
+        
+        <!-- Description -->
+        <p class="tagline">Acting as the central hub for future digital projects and initiatives.</p>
+        
+        <!-- Thick Divider -->
+        <div class="divider"></div>
+
+        <!-- Contact Stack -->
+        <div class="contact-info">
+            <span class="name">Roshan Ingle</span>
+            <a href="mailto:alwaysroshanpatil@gmail.com" class="email">alwaysroshanpatil@gmail.com</a>
+        </div>
+
+        <!-- Neobrutalist UPI Deep Link Button -->
+        <a href="upi://pay?pa=Q968343371@ybl&pn=Roshan%20Ingle&tn=Buy%20me%20a%20coffee&cu=INR" class="support-btn">
+            <svg viewBox="0 0 24 24">
+                <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.9 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/>
+            </svg>
+            Buy me a coffee
+        </a>
+    </div>
+
+</body>
+</html>
