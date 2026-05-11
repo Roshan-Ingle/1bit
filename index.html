@@ -2,224 +2,798 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1bit.sbs | Parent Node</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GitHub Liquid Glass Uploader 7.0</title>
     <style>
-        /* Space Grotesk is a perfect geometric font for neobrutalism */
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* CSS Reset & Variables */
         :root {
-            --bg-color: #0a0a0a;
-            --card-bg: #141414;
-            --border-color: #ffffff;
-            --accent-color: #D4FF00; /* Harsh neon lime */
-            --text-main: #ffffff;
-            --text-muted: #cccccc;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-hover: rgba(255, 255, 255, 0.25);
+            --text-color: #ffffff;
+            --accent: #ff9a9e;
         }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; }
+
+        /* Fluid Liquid Background */
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Space Grotesk', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            padding: 20px;
-            /* Raw grid background */
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            ::selection { background: var(--accent-color); color: #000; }
-        }
-
-        /* Neobrutalist Center-Aligned Card */
-        .card {
-            background-color: var(--card-bg);
-            border: 4px solid var(--border-color);
-            /* Hard, solid shadow instead of a soft blur */
-            box-shadow: 12px 12px 0px var(--accent-color);
-            padding: 3rem 2rem;
-            max-width: 540px;
-            width: 100%;
-            text-align: center;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Stark Status Badge */
-        .status-badge {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: #000000;
-            border: 2px solid var(--border-color);
-            box-shadow: 4px 4px 0px var(--border-color);
-            padding: 6px 16px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 2rem;
-        }
-
-        .domain {
-            font-size: 3.5rem;
-            font-weight: 700;
-            letter-spacing: -2px;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-        }
-
-        .tagline {
-            font-size: 1.1rem;
-            font-weight: 400;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 2.5rem;
-            max-width: 80%;
-        }
-
-        /* Thick Harsh Divider */
-        .divider {
-            width: 100%;
-            height: 4px;
-            background-color: var(--border-color);
-            margin-bottom: 2.5rem;
-        }
-
-        .contact-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 2rem;
-        }
-
-        .name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-main);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .email {
-            font-size: 1rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            position: relative;
-            transition: color 0.2s;
-        }
-
-        /* Neobrutalist highlight hover on email */
-        .email::after {
-            content: '';
-            position: absolute;
-            left: -5px;
-            bottom: 0;
-            width: calc(100% + 10px);
-            height: 8px;
-            background-color: var(--accent-color);
-            z-index: -1;
-            transition: height 0.2s;
-        }
-
-        .email:hover {
-            color: #000;
-        }
-
-        .email:hover::after {
-            height: 100%;
-        }
-
-        /* Big Chunky Support Button */
-        .support-btn {
-            display: inline-flex;
-            align-items: center;
             justify-content: center;
-            gap: 10px;
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            border: 3px solid var(--border-color);
-            box-shadow: 6px 6px 0px var(--accent-color);
-            padding: 14px 28px;
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.1s ease-in-out;
+            align-items: center;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #fbc2eb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            overflow-x: hidden;
+            padding: 20px;
+            color: var(--text-color);
         }
 
-        .support-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* The physical "button click" effect */
-        .support-btn:hover {
-            background-color: var(--accent-color);
-            color: #000000;
+        /* Fluid background blobs */
+        .blob {
+            position: fixed;
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.6;
+        }
+        .blob-1 { width: 300px; height: 300px; background: #ff0844; top: 10%; left: 10%; animation: float 8s ease-in-out infinite; }
+        .blob-2 { width: 400px; height: 400px; background: #2a0845; bottom: 5%; right: 5%; animation: float 12s ease-in-out infinite reverse; }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
         }
 
-        .support-btn:active {
-            transform: translate(6px, 6px);
-            box-shadow: 0px 0px 0px var(--accent-color);
+        /* Glassmorphism Container */
+        .glass-panel {
+            width: 100%; max-width: 450px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; 
+            padding: 60px 30px 40px 30px; /* Increased top padding for nav */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            transition: all 0.3s ease; position: relative; z-index: 10;
         }
 
-        /* Mobile adjustments */
-        @media (max-width: 480px) {
-            .card {
-                padding: 2.5rem 1.5rem;
-                box-shadow: 8px 8px 0px var(--accent-color);
-            }
-            .domain { font-size: 2.5rem; }
-            .tagline { max-width: 100%; }
-            .support-btn { width: 100%; }
+        h2 { text-align: center; margin-bottom: 25px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* Top Navigation for Home & Logout */
+        .top-nav {
+            position: absolute;
+            top: 20px; left: 20px; right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none; /* Let clicks pass through empty space */
         }
+        .nav-btn {
+            pointer-events: auto; /* Re-enable click on buttons */
+            width: auto;
+            padding: 6px 12px;
+            margin: 0;
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: #fff; cursor: pointer;
+            display: none; /* Hidden by default */
+            transition: all 0.3s ease; text-transform: none; font-weight: 500;
+            letter-spacing: normal; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+
+        .step { display: none; animation: fadeIn 0.5s ease; }
+        .step.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Form Elements */
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+
+        input[type="text"], input[type="password"], .custom-select-trigger, input[type="file"] {
+            width: 100%; padding: 12px 15px; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.2); border: 1px solid var(--glass-border);
+            border-radius: 10px; color: #fff; font-size: 1rem; outline: none; transition: all 0.3s ease;
+        }
+
+        input::placeholder { color: rgba(255, 255, 255, 0.7); }
+        input:focus { background: rgba(255, 255, 255, 0.3); border-color: #fff; box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+
+        /* Custom Checkbox */
+        .checkbox-container {
+            display: flex; align-items: center; margin-bottom: 20px; cursor: pointer; font-size: 0.9rem;
+        }
+        .checkbox-container input { display: none; }
+        .checkmark {
+            width: 20px; height: 20px; border: 2px solid var(--glass-border); border-radius: 5px;
+            margin-right: 10px; display: flex; justify-content: center; align-items: center; transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .checkbox-container input:checked ~ .checkmark { background: rgba(255,255,255,0.4); border-color: #fff; }
+        .checkbox-container input:checked ~ .checkmark::after { content: '✔'; color: #fff; font-size: 12px; }
+
+        /* Custom Dropdown UI */
+        .custom-select { position: relative; margin-bottom: 20px; }
+        .custom-options {
+            position: absolute; top: 100%; left: 0; right: 0; background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 10px;
+            max-height: 200px; overflow-y: auto; z-index: 99; display: none; margin-top: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .custom-options.show { display: block; animation: fadeIn 0.2s; }
+        .custom-option { padding: 12px 15px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .custom-option:hover { background: rgba(255,255,255,0.2); }
+        .custom-option:last-child { border-bottom: none; }
+        
+        .custom-options::-webkit-scrollbar { width: 6px; }
+        .custom-options::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 3px; }
+
+        .combobox { position: relative; }
+        .combobox-input { margin-bottom: 0; border-radius: 10px; }
+
+        /* Helper Text */
+        .helper-text { font-size: 0.8rem; margin-top: -10px; margin-bottom: 15px; opacity: 0.9; transition: all 0.3s ease; }
+        .highlight-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+
+        button {
+            width: 100%; padding: 14px; background: var(--glass-hover);
+            border: 1px solid var(--glass-border); border-radius: 10px;
+            color: #fff; font-size: 1rem; font-weight: bold; cursor: pointer;
+            transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 10px;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .status { margin-top: 15px; text-align: center; font-size: 0.9rem; min-height: 20px; font-weight: 500; }
+        .loader { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; vertical-align: middle; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Custom Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box {
+            background: rgba(255, 255, 255, 0.15); border: 1px solid var(--glass-border);
+            border-radius: 15px; padding: 25px; width: 90%; max-width: 350px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-box h3 { margin-bottom: 10px; font-weight: 500; }
+        .modal-box p { font-size: 0.9rem; margin-bottom: 15px; opacity: 0.9; word-break: break-all; }
+        .modal-box input { margin-bottom: 15px; text-align: center; letter-spacing: 2px; }
+        .modal-btns { display: flex; gap: 10px; width: 100%; }
+        .modal-btns button { margin-top: 0; padding: 10px; }
+        .btn-cancel { background: rgba(255, 50, 50, 0.3); border-color: rgba(255, 50, 50, 0.5); }
+        .btn-cancel:hover { background: rgba(255, 50, 50, 0.5); }
+
+        /* Countdown specific */
+        .countdown-circle {
+            width: 60px; height: 60px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: #fff; display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; animation: spin 1s linear infinite;
+        }
+        .countdown-circle span { animation: spin 1s linear infinite reverse; }
+        .live-link { color: #a8ffb1; font-weight: bold; text-decoration: none; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; display: block; margin-bottom: 15px; }
+        .live-link:hover { text-decoration: underline; background: rgba(0,0,0,0.5); }
+
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <!-- Stark Badge -->
-        <div class="status-badge">
-            Parent Domain
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="glass-panel">
+        
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <button id="btn-home" class="nav-btn" onclick="app.goHome()">🏠 Home</button>
+            <button id="btn-logout" class="nav-btn" onclick="app.logout()" style="margin-left: auto;">🚪 Logout</button>
         </div>
 
-        <!-- Main Heading -->
-        <h1 class="domain">1bit.sbs</h1>
-        
-        <!-- Description -->
-        <p class="tagline">Acting as the central hub for future digital projects and initiatives.</p>
-        
-        <!-- Thick Divider -->
-        <div class="divider"></div>
+        <h2>GitHub Web Push 7.0</h2>
 
-        <!-- Contact Stack -->
-        <div class="contact-info">
-            <span class="name">Roshan Ingle</span>
-            <a href="mailto:alwaysroshanpatil@gmail.com" class="email">alwaysroshanpatil@gmail.com</a>
+        <!-- Step 1: Login -->
+        <div id="step-1" class="step active">
+            <label for="pat-input">Personal Access Token (PAT)</label>
+            <input type="password" id="pat-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+            
+            <label class="checkbox-container">
+                <input type="checkbox" id="remember-me">
+                <span class="checkmark"></span>
+                Remember & Encrypt on Device
+            </label>
+
+            <button onclick="app.login()" id="btn-login">Verify & Login</button>
+            <div id="status-1" class="status"></div>
         </div>
 
-        <!-- Neobrutalist UPI Deep Link Button -->
-        <a href="upi://pay?pa=Q968343371@ybl&pn=Roshan%20Ingle&tn=Buy%20me%20a%20coffee&cu=INR" class="support-btn">
-            <svg viewBox="0 0 24 24">
-                <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.9 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/>
-            </svg>
-            Buy me a coffee
-        </a>
+        <!-- Step 2: Select or Create Repo (Main Menu) -->
+        <div id="step-2" class="step">
+            <label>Select or Create New Repository</label>
+            <div class="combobox custom-select">
+                <input type="text" id="repo-input" class="combobox-input" placeholder="e.g. my-new-website" onclick="app.toggleDropdown('repo-options')" oninput="app.filterRepos()">
+                <div class="custom-options" id="repo-options"></div>
+            </div>
+            <p class="helper-text"><i>* Type a new name to create a repository instantly.</i></p>
+
+            <button onclick="app.goToFolderStep()" id="btn-repo">Next Step</button>
+            <div id="status-2" class="status"></div>
+        </div>
+
+        <!-- Step 3: Folder & Upload & Publish -->
+        <div id="step-3" class="step">
+            <label>Select or Type Folder</label>
+            <div class="combobox custom-select">
+                <input type="text" id="folder-input" class="combobox-input" placeholder="e.g. src/images (leave blank for root)" onclick="app.toggleDropdown('folder-options')" oninput="app.filterFolders()">
+                <div class="custom-options" id="folder-options"></div>
+            </div>
+
+            <label for="file-input">Select File (Max 20MB)</label>
+            <input type="file" id="file-input">
+            <p class="helper-text" id="file-helper-text"><i>* .html files will auto-rename to index.html</i></p>
+
+            <div class="highlight-box">
+                <label class="checkbox-container" style="margin-bottom: 0;">
+                    <input type="checkbox" id="publish-pages" checked>
+                    <span class="checkmark"></span>
+                    🚀 Publish to GitHub Pages & get Live Link
+                </label>
+            </div>
+
+            <button onclick="app.uploadFile()" id="btn-upload">Push to GitHub</button>
+            <div id="status-3" class="status"></div>
+        </div>
     </div>
 
+    <!-- Custom Modal -->
+    <div class="modal-overlay" id="custom-modal">
+        <div class="modal-box">
+            <div id="modal-timer" class="countdown-circle" style="display: none;"><span>30</span></div>
+            <h3 id="modal-title">Title</h3>
+            <p id="modal-desc">Description</p>
+            <input type="password" id="modal-input" placeholder="Enter PIN..." maxlength="8" style="display:none;">
+            <div class="modal-btns" id="modal-btns">
+                <button class="btn-cancel" id="modal-btn-cancel">Cancel</button>
+                <button id="modal-btn-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = (() => {
+            // State
+            let githubHeaders = {};
+            let currentUser = "";
+            let selectedRepoFullName = "";
+            let selectedRepoName = "";
+            let selectedRepoDefaultBranch = "main";
+            let repoListCache =[];
+            let folderListCache =[];
+
+            // DOM Elements
+            const els = {
+                homeBtn: document.getElementById('btn-home'),
+                logoutBtn: document.getElementById('btn-logout'),
+                step1: document.getElementById('step-1'),
+                step2: document.getElementById('step-2'),
+                step3: document.getElementById('step-3'),
+                patInput: document.getElementById('pat-input'),
+                rememberCheck: document.getElementById('remember-me'),
+                repoInput: document.getElementById('repo-input'),
+                repoOptions: document.getElementById('repo-options'),
+                folderInput: document.getElementById('folder-input'),
+                folderOptions: document.getElementById('folder-options'),
+                fileInput: document.getElementById('file-input'),
+                fileHelper: document.getElementById('file-helper-text'),
+                publishCheck: document.getElementById('publish-pages'),
+                modal: document.getElementById('custom-modal')
+            };
+
+            // ---- INSTANT FILE RENAMING LOGIC ----
+            els.fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                    els.fileHelper.innerHTML = `<i>* .html files will auto-rename to index.html</i>`;
+                    els.fileHelper.style.color = "inherit";
+                    return;
+                }
+
+                if (file.name.toLowerCase().endsWith('.html') && file.name.toLowerCase() !== 'index.html') {
+                    const renamedFile = new File([file], 'index.html', {
+                        type: file.type,
+                        lastModified: file.lastModified
+                    });
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(renamedFile);
+                    e.target.files = dataTransfer.files;
+
+                    els.fileHelper.innerHTML = `✅ <b>${file.name}</b> was instantly renamed to <b>index.html</b>`;
+                    els.fileHelper.style.color = "#a8ffb1"; 
+                } else {
+                    els.fileHelper.innerHTML = `File ready: <b>${file.name}</b>`;
+                    els.fileHelper.style.color = "inherit";
+                }
+            });
+
+            // Utilities
+            const escapeHTML = (str) => {
+                if (!str) return '';
+                return str.replace(/[&<>'"]/g, tag => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+                }[tag]));
+            };
+
+            const setStatus = (step, msg, isLoading = false) => {
+                const el = document.getElementById(`status-${step}`);
+                el.innerHTML = isLoading ? `<span class="loader"></span> ${escapeHTML(msg)}` : escapeHTML(msg);
+            };
+
+            const showStep = (stepNum) => {
+                document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+                document.getElementById(`step-${stepNum}`).classList.add('active');
+
+                // Toggle Navigation Buttons Visually
+                if (stepNum === 1) {
+                    els.homeBtn.style.display = 'none';
+                    els.logoutBtn.style.display = 'none';
+                } else if (stepNum === 2) {
+                    els.homeBtn.style.display = 'none';
+                    els.logoutBtn.style.display = 'block';
+                } else if (stepNum === 3) {
+                    els.homeBtn.style.display = 'block';
+                    els.logoutBtn.style.display = 'block';
+                }
+            };
+
+            // ---- NAVIGATION ACTIONS (HOME & LOGOUT) ----
+            const goHome = () => {
+                // Clear UI values from step 3
+                els.folderInput.value = '';
+                els.fileInput.value = '';
+                els.fileHelper.innerHTML = `<i>* .html files will auto-rename to index.html</i>`;
+                els.fileHelper.style.color = "inherit";
+                setStatus(3, "");
+                // Jump to Main Menu (Step 2)
+                showStep(2);
+            };
+
+            const logout = () => {
+                // Erase session data
+                githubHeaders = {};
+                currentUser = "";
+                selectedRepoFullName = "";
+                selectedRepoName = "";
+                repoListCache = [];
+                folderListCache =[];
+                
+                // Clear inputs
+                els.patInput.value = '';
+                els.repoInput.value = '';
+                els.folderInput.value = '';
+                els.fileInput.value = '';
+                
+                // Remove stored PIN/PAT from device
+                els.rememberCheck.checked = false;
+                localStorage.removeItem('gh_secure_pat');
+                
+                showStep(1);
+            };
+
+            // Modal Handler
+            const showModal = (title, desc, requireInput = false, hideButtons = false) => {
+                return new Promise((resolve) => {
+                    document.getElementById('modal-title').textContent = title;
+                    document.getElementById('modal-desc').innerHTML = desc; 
+                    const input = document.getElementById('modal-input');
+                    const btns = document.getElementById('modal-btns');
+                    const timer = document.getElementById('modal-timer');
+                    timer.style.display = 'none';
+                    
+                    if (requireInput) {
+                        input.style.display = 'block';
+                        input.value = '';
+                        setTimeout(() => input.focus(), 100);
+                    } else {
+                        input.style.display = 'none';
+                    }
+
+                    btns.style.display = hideButtons ? 'none' : 'flex';
+                    els.modal.classList.add('active');
+
+                    const cleanup = () => {
+                        els.modal.classList.remove('active');
+                        document.getElementById('modal-btn-ok').onclick = null;
+                        document.getElementById('modal-btn-cancel').onclick = null;
+                    };
+
+                    document.getElementById('modal-btn-ok').onclick = () => {
+                        const val = requireInput ? input.value : true;
+                        cleanup(); resolve(val);
+                    };
+
+                    document.getElementById('modal-btn-cancel').onclick = () => {
+                        cleanup(); resolve(null);
+                    };
+                });
+            };
+
+            const startCountdownModal = (seconds, title, desc) => {
+                return new Promise((resolve) => {
+                    document.getElementById('modal-title').textContent = title;
+                    document.getElementById('modal-desc').innerHTML = desc;
+                    document.getElementById('modal-input').style.display = 'none';
+                    document.getElementById('modal-btns').style.display = 'none';
+                    
+                    const timerCircle = document.getElementById('modal-timer');
+                    const timerSpan = timerCircle.querySelector('span');
+                    timerCircle.style.display = 'flex';
+                    els.modal.classList.add('active');
+
+                    let remaining = seconds;
+                    timerSpan.textContent = remaining;
+
+                    const interval = setInterval(() => {
+                        remaining--;
+                        timerSpan.textContent = remaining;
+                        if (remaining <= 0) {
+                            clearInterval(interval);
+                            timerCircle.style.display = 'none';
+                            document.getElementById('modal-btns').style.display = 'flex';
+                            resolve();
+                        }
+                    }, 1000);
+                });
+            };
+
+            const toggleDropdown = (id) => {
+                const el = document.getElementById(id);
+                const isShowing = el.classList.contains('show');
+                document.querySelectorAll('.custom-options').forEach(e => e.classList.remove('show'));
+                if (!isShowing) el.classList.add('show');
+            };
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show'));
+                }
+            });
+
+            // Crypto (On-Device Encryption)
+            const cryptoConfig = { name: "AES-GCM", length: 256 };
+            const getCryptoKey = async (pin, salt) => {
+                const enc = new TextEncoder();
+                const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(pin), { name: "PBKDF2" }, false, ["deriveKey"]);
+                return crypto.subtle.deriveKey(
+                    { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+                    keyMaterial, cryptoConfig, false,["encrypt", "decrypt"]
+                );
+            };
+
+            const encryptPAT = async (pat, pin) => {
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const key = await getCryptoKey(pin, salt);
+                const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(pat));
+                const buf2b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+                localStorage.setItem('gh_secure_pat', JSON.stringify({ salt: buf2b64(salt), iv: buf2b64(iv), data: buf2b64(encrypted) }));
+            };
+
+            const decryptPAT = async (pin) => {
+                try {
+                    const stored = JSON.parse(localStorage.getItem('gh_secure_pat'));
+                    if (!stored) return null;
+                    const b642buf = (b64) => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+                    const key = await getCryptoKey(pin, b642buf(stored.salt));
+                    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b642buf(stored.iv) }, key, b642buf(stored.data));
+                    return new TextDecoder().decode(decrypted);
+                } catch (e) { return null; }
+            };
+
+            const checkSavedPAT = async () => {
+                if (localStorage.getItem('gh_secure_pat')) {
+                    const pin = await showModal("Unlock PAT", "Enter your PIN to decrypt your saved GitHub token:", true);
+                    if (pin) {
+                        const pat = await decryptPAT(pin);
+                        if (pat) {
+                            els.patInput.value = pat;
+                            els.rememberCheck.checked = true;
+                            login();
+                        } else {
+                            showModal("Error", "Incorrect PIN. Please re-enter your PAT manually.");
+                            localStorage.removeItem('gh_secure_pat');
+                        }
+                    }
+                }
+            };
+
+            // ---- STEP 1: Login & Fetch Repos ----
+            const login = async () => {
+                const pat = els.patInput.value.trim();
+                if (!pat) return setStatus(1, 'Please enter a valid PAT.');
+
+                githubHeaders = { 'Accept': 'application/vnd.github.v3+json', 'Authorization': `Bearer ${pat}` };
+                setStatus(1, 'Authenticating...', true);
+                document.getElementById('btn-login').disabled = true;
+
+                try {
+                    // Fetch Current User
+                    const userRes = await fetch('https://api.github.com/user', { headers: githubHeaders });
+                    if (!userRes.ok) throw new Error('Unauthorized. Check your PAT.');
+                    const userData = await userRes.json();
+                    currentUser = userData.login;
+
+                    // Fetch Repos
+                    const reposRes = await fetch('https://api.github.com/user/repos?per_page=100&sort=updated', { headers: githubHeaders });
+                    if (!reposRes.ok) throw new Error('Failed to fetch repositories.');
+                    repoListCache = await reposRes.json();
+                    
+                    if (els.rememberCheck.checked && !localStorage.getItem('gh_secure_pat')) {
+                        const pin = await showModal("Secure Storage", "Create a PIN to encrypt your PAT on this device:", true);
+                        if (pin) await encryptPAT(pat, pin);
+                    } else if (!els.rememberCheck.checked) {
+                        localStorage.removeItem('gh_secure_pat');
+                    }
+
+                    filterRepos(""); // Populate UI
+                    
+                    // Default to ekatra if exists
+                    const ekatra = repoListCache.find(r => r.name.toLowerCase() === 'ekatra');
+                    if(ekatra) els.repoInput.value = ekatra.name;
+
+                    showStep(2);
+                } catch (err) {
+                    setStatus(1, err.message);
+                    localStorage.removeItem('gh_secure_pat');
+                } finally {
+                    document.getElementById('btn-login').disabled = false;
+                    setStatus(1, '');
+                }
+            };
+
+            // ---- STEP 2: Repo Logic (Select or Create) ----
+            const addRepoOption = (repo) => {
+                const div = document.createElement('div');
+                div.className = 'custom-option';
+                div.textContent = escapeHTML(repo.name);
+                div.onclick = () => {
+                    els.repoInput.value = repo.name;
+                    selectedRepoDefaultBranch = repo.default_branch || 'main';
+                    toggleDropdown('repo-options');
+                };
+                els.repoOptions.appendChild(div);
+            };
+
+            const filterRepos = (queryOverride) => {
+                const query = (typeof queryOverride === 'string' ? queryOverride : els.repoInput.value).toLowerCase();
+                els.repoOptions.innerHTML = '';
+                const filtered = repoListCache.filter(r => r.name.toLowerCase().includes(query));
+                filtered.forEach(addRepoOption);
+                if (filtered.length > 0) els.repoOptions.classList.add('show');
+                else els.repoOptions.classList.remove('show');
+            };
+
+            const goToFolderStep = async () => {
+                const inputName = els.repoInput.value.trim();
+                if (!inputName) return setStatus(2, 'Please select or type a repository name.');
+
+                document.getElementById('btn-repo').disabled = true;
+                
+                // Check if Repo Exists in Cache
+                const existingRepo = repoListCache.find(r => r.name.toLowerCase() === inputName.toLowerCase());
+
+                try {
+                    if (existingRepo) {
+                        selectedRepoName = existingRepo.name;
+                        selectedRepoFullName = existingRepo.full_name;
+                        selectedRepoDefaultBranch = existingRepo.default_branch || 'main';
+                    } else {
+                        // Create New Repository
+                        setStatus(2, `Creating new repository '${inputName}'...`, true);
+                        const createRes = await fetch('https://api.github.com/user/repos', {
+                            method: 'POST',
+                            headers: { ...githubHeaders, 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: inputName, auto_init: true }) // auto_init creates 'main'
+                        });
+
+                        if (!createRes.ok) {
+                            const err = await createRes.json();
+                            throw new Error(err.message || 'Failed to create repository.');
+                        }
+                        const newRepoData = await createRes.json();
+                        selectedRepoName = newRepoData.name;
+                        selectedRepoFullName = newRepoData.full_name;
+                        selectedRepoDefaultBranch = newRepoData.default_branch || 'main';
+                        repoListCache.push(newRepoData); // Add to cache
+                        
+                        // Wait 2s for GitHub to initialize the default branch fully
+                        await new Promise(r => setTimeout(r, 2000));
+                    }
+
+                    // Fetch Folders
+                    setStatus(2, 'Loading repository data...', true);
+                    const res = await fetch(`https://api.github.com/repos/${selectedRepoFullName}/contents/`, { headers: githubHeaders });
+                    els.folderOptions.innerHTML = '';
+                    folderListCache =[];
+
+                    if (res.ok) {
+                        const contents = await res.json();
+                        contents.forEach(item => {
+                            if (item.type === 'dir') {
+                                folderListCache.push(item.path);
+                                addFolderOption(item.path);
+                            }
+                        });
+                    }
+                    showStep(3);
+                } catch (err) {
+                    setStatus(2, err.message);
+                } finally {
+                    document.getElementById('btn-repo').disabled = false;
+                    setStatus(2, '');
+                }
+            };
+
+            // ---- STEP 3: Folder & File Upload ----
+            const addFolderOption = (path) => {
+                const div = document.createElement('div');
+                div.className = 'custom-option';
+                div.textContent = escapeHTML(path);
+                div.onclick = () => {
+                    els.folderInput.value = path;
+                    toggleDropdown('folder-options');
+                };
+                els.folderOptions.appendChild(div);
+            };
+
+            const filterFolders = () => {
+                const query = els.folderInput.value.toLowerCase();
+                els.folderOptions.innerHTML = '';
+                const filtered = folderListCache.filter(f => f.toLowerCase().includes(query));
+                filtered.forEach(addFolderOption);
+                if (filtered.length > 0) els.folderOptions.classList.add('show');
+                else els.folderOptions.classList.remove('show');
+            };
+
+            const publishToPages = async () => {
+                try {
+                    const pagesRes = await fetch(`https://api.github.com/repos/${selectedRepoFullName}/pages`, {
+                        method: 'POST',
+                        headers: { ...githubHeaders, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ source: { branch: selectedRepoDefaultBranch, path: "/" } })
+                    });
+                    
+                    if (!pagesRes.ok && pagesRes.status !== 409) {
+                        throw new Error("Could not enable GitHub Pages automatically.");
+                    }
+                } catch (e) {
+                    console.log(e); // non-blocking error
+                }
+            };
+
+            const uploadFile = async () => {
+                const file = els.fileInput.files[0];
+                let folder = els.folderInput.value.trim();
+
+                if (!file) return showModal("Wait!", "Please select a file to upload first.");
+                if (file.size > 20 * 1024 * 1024) return showModal("File Too Large", "Please select a file under 20MB.");
+
+                if (folder.startsWith('/')) folder = folder.substring(1);
+                if (folder.endsWith('/')) folder = folder.slice(0, -1);
+
+                const encodedFolder = folder ? folder.split('/').map(f => encodeURIComponent(f)).join('/') : '';
+                const safeFileName = encodeURIComponent(file.name);
+                const path = folder ? `${encodedFolder}/${safeFileName}` : safeFileName;
+                const url = `https://api.github.com/repos/${selectedRepoFullName}/contents/${path}`;
+                const uiTargetFolder = folder ? `'${folder}'` : `Root (${selectedRepoDefaultBranch})`;
+
+                setStatus(3, 'Reading file...', true);
+                document.getElementById('btn-upload').disabled = true;
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const base64Content = e.target.result.split(',')[1];
+                    
+                    try {
+                        setStatus(3, `Checking for existing file in ${uiTargetFolder}...`, true);
+                        let fileSha = null;
+                        
+                        const checkRes = await fetch(url, { headers: githubHeaders });
+                        if (checkRes.ok) {
+                            const fileData = await checkRes.json();
+                            fileSha = fileData.sha;
+                        }
+
+                        const body = { 
+                            message: `Update ${file.name} in ${folder || 'root'} via Web Uploader`, 
+                            content: base64Content 
+                        };
+                        if (fileSha) body.sha = fileSha;
+
+                        setStatus(3, `Pushing to ${uiTargetFolder}...`, true);
+                        const putRes = await fetch(url, {
+                            method: 'PUT',
+                            headers: { ...githubHeaders, 'Content-Type': 'application/json' },
+                            body: JSON.stringify(body)
+                        });
+
+                        if (!putRes.ok) {
+                            const errData = await putRes.json();
+                            throw new Error(errData.message || 'Upload failed');
+                        }
+
+                        // --- GITHUB PAGES LOGIC ---
+                        if (els.publishCheck.checked) {
+                            setStatus(3, `Enabling GitHub Pages...`, true);
+                            await publishToPages();
+
+                            // Start 30s countdown
+                            await startCountdownModal(30, "Building Live Site", "GitHub is building your page. Please wait...");
+                            
+                            // Construct Live URL
+                            let liveUrl = "";
+                            if (selectedRepoName.toLowerCase() === `${currentUser.toLowerCase()}.github.io`) {
+                                liveUrl = `https://${currentUser}.github.io/`;
+                            } else {
+                                liveUrl = `https://${currentUser}.github.io/${selectedRepoName}/`;
+                            }
+                            
+                            let appendPath = folder ? `${folder}/` : "";
+                            if (file.name !== 'index.html') appendPath += file.name;
+                            if (appendPath) liveUrl += appendPath;
+
+                            const successHtml = `
+                                File pushed successfully!<br><br>
+                                <a href="${liveUrl}" target="_blank" class="live-link">🔗 Click here to view live site</a>
+                                <br><small><i>(If it shows 404, refresh the link in a few seconds)</i></small>
+                            `;
+                            await showModal("🚀 Published Successfully", successHtml);
+                        } else {
+                            await showModal("Success", `File pushed successfully to ${uiTargetFolder}.`);
+                        }
+
+                        // Reset file input only, leave folder alone in case they want to upload more to same place
+                        els.fileInput.value = '';
+                        els.fileHelper.innerHTML = `<i>* .html files will auto-rename to index.html</i>`;
+                        els.fileHelper.style.color = "inherit";
+                        setStatus(3, "");
+
+                    } catch (err) {
+                        setStatus(3, `❌ Error: ${err.message}`);
+                    } finally {
+                        document.getElementById('btn-upload').disabled = false;
+                    }
+                };
+                
+                reader.onerror = () => {
+                    setStatus(3, 'Failed to read file.');
+                    document.getElementById('btn-upload').disabled = false;
+                };
+
+                reader.readAsDataURL(file);
+            };
+
+            // Init
+            window.addEventListener('DOMContentLoaded', checkSavedPAT);
+
+            // Expose public methods
+            return { login, filterRepos, goToFolderStep, toggleDropdown, filterFolders, uploadFile, goHome, logout };
+        })();
+    </script>
 </body>
 </html>
