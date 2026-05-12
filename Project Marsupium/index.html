@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Marsupium | Stealth Steganography</title>
+    <style>
+        /* Material You (Material Design 3) Color Tokens - Auto Adapting Light/Dark */
+        :root {
+            /* Light Theme */
+            --md-bg: #fdf8fd;
+            --md-surface: #fdf8fd;
+            --md-surface-variant: #e7e0ec;
+            --md-on-surface: #1c1b1f;
+            --md-on-surface-variant: #49454f;
+            --md-primary: #6750a4;
+            --md-on-primary: #ffffff;
+            --md-secondary-container: #e8def8;
+            --md-on-secondary-container: #1d192b;
+            --md-outline: #79747e;
+            --md-error: #b3261e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Dark Theme */
+                --md-bg: #141218;
+                --md-surface: #141218;
+                --md-surface-variant: #49454f;
+                --md-on-surface: #e6e1e5;
+                --md-on-surface-variant: #cac4d0;
+                --md-primary: #d0bcff;
+                --md-on-primary: #381e72;
+                --md-secondary-container: #4a4458;
+                --md-on-secondary-container: #e8def8;
+                --md-outline: #938f99;
+                --md-error: #f2b8b5;
+            }
+        }
+
+        body {
+            font-family: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+            background-color: var(--md-bg);
+            color: var(--md-on-surface);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+            box-sizing: border-box;
+            gap: 24px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--md-surface);
+            padding: 32px 24px;
+            border-radius: 28px;
+            box-sizing: border-box;
+            box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            text-align: center;
+            margin: 0 0 32px 0;
+            color: var(--md-on-surface);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 32px;
+            border: 1px solid var(--md-outline);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            cursor: pointer;
+            color: var(--md-on-surface);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-right: 1px solid var(--md-outline);
+            transition: background-color 0.2s;
+            background: transparent;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab.active {
+            background: var(--md-secondary-container);
+            color: var(--md-on-secondary-container);
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .tutorial {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--md-on-surface-variant);
+            background: var(--md-surface-variant);
+            padding: 20px;
+            border-radius: 16px;
+        }
+        
+        .tutorial p { margin: 0 0 16px 0; }
+        .tutorial p:last-child { margin: 0; }
+        .tutorial strong { color: var(--md-on-surface); font-weight: 500; }
+        .tutorial .highlight-title { color: var(--md-primary); font-weight: 500; display: block; margin-bottom: 4px;}
+
+        .group { margin-bottom: 24px; }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--md-on-surface-variant);
+            margin-bottom: 4px;
+            margin-left: 16px;
+        }
+
+        input[type="file"], input[type="password"], textarea {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--md-outline);
+            padding: 16px;
+            color: var(--md-on-surface);
+            border-radius: 16px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s, border-width 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--md-primary);
+            border-width: 2px;
+            padding: 15px;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: var(--md-secondary-container);
+            border: none;
+            color: var(--md-on-secondary-container);
+            padding: 8px 16px;
+            border-radius: 100px;
+            margin-right: 12px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        textarea { resize: vertical; min-height: 120px; }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--md-primary);
+            color: var(--md-on-primary);
+            border: none;
+            font-weight: 500;
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 8px;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:disabled {
+            background: var(--md-surface-variant);
+            color: var(--md-on-surface-variant);
+            cursor: not-allowed;
+            opacity: 0.38;
+        }
+
+        .output {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--md-surface-variant);
+            color: var(--md-on-surface-variant);
+            border-radius: 16px;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            display: none;
+            word-wrap: break-word;
+        }
+
+        .footer {
+            font-size: 0.875rem;
+            color: var(--md-on-surface-variant);
+            text-align: center;
+        }
+
+        .footer a {
+            color: var(--md-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+        }
+
+        .footer a:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Project Marsupium</h1>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchView('info')">Info</div>
+        <div class="tab" onclick="switchView('hide')">Hide</div>
+        <div class="tab" onclick="switchView('extract')">Extract</div>
+    </div>
+
+    <!-- INFO VIEW -->
+    <div id="view-info" class="view active tutorial">
+        <p>This tool creates <strong>100% normal-looking</strong> media files containing encrypted text.</p>
+        <p>• <strong>Images:</strong> Text is hidden seamlessly in pixel color codes. It looks and opens like a normal image.<br>
+        • <strong>Audio/Video:</strong> Text is bound silently to the binary container. It plays flawlessly in media players.</p>
+        <p><span class="highlight-title">How to send without suspicion:</span>
+        Messaging apps (WhatsApp, Discord) normally compress media and delete hidden data. To prevent this, simply send the photo or video as a <strong>"Document"</strong> or <strong>"File"</strong>. This is a common practice for sending high-quality media, so it raises zero suspicion while preserving your hidden data.</p>
+    </div>
+
+    <!-- HIDE VIEW -->
+    <div id="view-hide" class="view">
+        <div class="group">
+            <label>Carrier Media (Video, Audio, Image)</label>
+            <input type="file" id="h-file" accept="image/*,video/*,audio/*">
+        </div>
+        <div class="group">
+            <label>Secret Message</label>
+            <textarea id="h-text" placeholder="Message to hide..."></textarea>
+        </div>
+        <div class="group">
+            <label>Secret Code</label>
+            <input type="password" id="h-pass" placeholder="Military-grade AES password">
+        </div>
+        <button id="btn-hide" onclick="hideData()">Encrypt & Hide</button>
+    </div>
+
+    <!-- EXTRACT VIEW -->
+    <div id="view-extract" class="view">
+        <div class="group">
+            <label>Infected Media File</label>
+            <input type="file" id="e-file">
+        </div>
+        <div class="group">
+            <label>Secret Code</label>
+            <input type="password" id="e-pass" placeholder="Decryption password">
+        </div>
+        <button id="btn-extract" onclick="extractData()">Extract Message</button>
+        <div id="e-output" class="output"></div>
+    </div>
+</div>
+
+<div class="footer">
+    <a href="https://1bit.sbs" target="_blank">About 1bit</a>
+</div>
+
+<script>
+    const SIGNATURE = "MARSUPIUM!";
+    const ENC = new TextEncoder();
+    const DEC = new TextDecoder();
+    const SIG_BYTES = ENC.encode(SIGNATURE);
+
+    function switchView(v) {
+        document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
+        document.getElementById(`view-${v}`).classList.add('active');
+        const idx = v === 'info' ? 0 : (v === 'hide' ? 1 : 2);
+        document.querySelectorAll('.tab')[idx].classList.add('active');
+        document.getElementById('e-output').style.display = 'none';
+    }
+
+    function setBtn(id, loading, text) {
+        const b = document.getElementById(id);
+        b.disabled = loading;
+        b.innerText = loading ? "Processing..." : text;
+    }
+
+    // --- AES-256-GCM Cryptography ---
+    async function deriveKey(pass, salt) {
+        const mat = await crypto.subtle.importKey("raw", ENC.encode(pass), "PBKDF2", false, ["deriveKey"]);
+        return crypto.subtle.deriveKey(
+            { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+            mat, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+        );
+    }
+
+    async function encryptPayload(text, pass) {
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const key = await deriveKey(pass, salt);
+        const enc = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, ENC.encode(text));
+        
+        const payload = new Uint8Array(28 + enc.byteLength);
+        payload.set(salt, 0); payload.set(iv, 16); payload.set(new Uint8Array(enc), 28);
+        return payload;
+    }
+
+    async function decryptPayload(payload, pass) {
+        try {
+            const key = await deriveKey(pass, payload.slice(0, 16));
+            const dec = await crypto.subtle.decrypt({ name: "AES-GCM", iv: payload.slice(16, 28) }, key, payload.slice(28));
+            return DEC.decode(dec);
+        } catch { throw new Error("Incorrect password or file compressed/corrupted."); }
+    }
+
+    // --- Helper: Get Safe Filename ---
+    function getSafeFilename(originalName, isImage) {
+        const lastDot = originalName.lastIndexOf('.');
+        const baseName = lastDot !== -1 ? originalName.substring(0, lastDot) : originalName;
+        const ext = isImage ? ".png" : (lastDot !== -1 ? originalName.substring(lastDot) : "");
+        return `${baseName}_safe${ext}`;
+    }
+
+    // --- Media Processing Routes ---
+    async function hideData() {
+        const file = document.getElementById('h-file').files[0];
+        const text = document.getElementById('h-text').value;
+        const pass = document.getElementById('h-pass').value;
+
+        if (!file || !text || !pass) return alert("All fields are required.");
+        setBtn('btn-hide', true, "Encrypt & Hide");
+
+        try {
+            const payload = await encryptPayload(text, pass);
+            const isImage = file.type.startsWith("image/");
+            let resultFile, type;
+
+            if (isImage) {
+                resultFile = await hideInImagePixels(file, payload);
+                type = "image/png"; // Force PNG to prevent lossy compression killing pixels
+            } else {
+                resultFile = await hideInEOF(file, payload);
+                type = file.type;
+            }
+
+            const link = document.createElement('a');
+            link.download = getSafeFilename(file.name, isImage);
+            link.href = URL.createObjectURL(new Blob([resultFile], { type: type }));
+            link.click();
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+        setBtn('btn-hide', false, "Encrypt & Hide");
+    }
+
+    async function extractData() {
+        const file = document.getElementById('e-file').files[0];
+        const pass = document.getElementById('e-pass').value;
+        const out = document.getElementById('e-output');
+
+        if (!file || !pass) return alert("File and password required.");
+        setBtn('btn-extract', true, "Extract Message");
+        out.style.display = 'none';
+
+        try {
+            const bytes = new Uint8Array(await file.arrayBuffer());
+            let payload;
+
+            // 1. Check if it's EOF Audio/Video Steganography
+            const sigCheck = DEC.decode(bytes.slice(bytes.length - SIG_BYTES.length));
+            if (sigCheck === SIGNATURE) {
+                const lenView = new DataView(bytes.buffer, bytes.length - SIG_BYTES.length - 4, 4);
+                const len = lenView.getUint32(0, true);
+                payload = bytes.slice(bytes.length - SIG_BYTES.length - 4 - len, bytes.length - SIG_BYTES.length - 4);
+            } 
+            // 2. If not, try checking Image Pixel Steganography
+            else if (file.type.startsWith("image/") || file.name.endsWith(".png")) {
+                payload = await extractFromImagePixels(file);
+            } else {
+                throw new Error("No hidden data found in this file.");
+            }
+
+            const msg = await decryptPayload(payload, pass);
+            out.innerHTML = `<strong>Hidden Message:</strong><br><br>${msg.replace(/\n/g, '<br>')}`;
+            out.style.color = "var(--md-on-surface-variant)";
+            out.style.display = "block";
+        } catch (e) {
+            out.innerText = e.message;
+            out.style.color = "var(--md-error)";
+            out.style.display = "block";
+        }
+        setBtn('btn-extract', false, "Extract Message");
+    }
+
+    // --- Image LSB Engine (Invisible Pixels) ---
+    async function hideInImagePixels(file, payload) {
+        const img = await createImageBitmap(file);
+        const cvs = document.createElement('canvas');
+        cvs.width = img.width; cvs.height = img.height;
+        const ctx = cvs.getContext('2d', { willReadFrequently: true }); // Optimized read/write flag
+        ctx.drawImage(img, 0, 0);
+        
+        const imgData = ctx.getImageData(0, 0, cvs.width, cvs.height);
+        const data = imgData.data;
+
+        const lenBuf = new ArrayBuffer(4);
+        new DataView(lenBuf).setUint32(0, payload.length, false);
+        const fullData = new Uint8Array(4 + payload.length);
+        fullData.set(new Uint8Array(lenBuf), 0);
+        fullData.set(payload, 4);
+
+        const maxBytes = Math.floor(((data.length / 4) * 3) / 8);
+        if (fullData.length > maxBytes) throw new Error("Image resolution too small to hold this text length.");
+
+        let bitIdx = 0;
+        const totalBits = fullData.length * 8;
+
+        for (let i = 0; i < data.length; i++) {
+            if ((i + 1) % 4 === 0) continue; // Ignore Alpha channel
+            if (bitIdx < totalBits) {
+                const byteIdx = Math.floor(bitIdx / 8);
+                const bitInByte = 7 - (bitIdx % 8);
+                const bit = (fullData[byteIdx] >> bitInByte) & 1;
+                data[i] = (data[i] & 0xFE) | bit; 
+                bitIdx++;
+            } else break;
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        return await new Promise(res => cvs.toBlob(blob => res(blob.arrayBuffer()), "image/png"));
+    }
+
+    async function extractFromImagePixels(file) {
+        const img = await createImageBitmap(file);
+        const cvs = document.createElement('canvas');
+        cvs.width = img.width; cvs.height = img.height;
+        const ctx = cvs.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+        
+        const imgData = ctx.getImageData(0, 0, cvs.width, cvs.height);
+        const data = imgData.data;
+
+        let len = 0, bitIdx = 0, i = 0;
+
+        // Extract 32-bit payload length safely
+        for (; i < data.length && bitIdx < 32; i++) {
+            if ((i + 1) % 4 === 0) continue;
+            // Unsigned shift >>> 0 ensures random noise doesn't flip 'len' into negative integers
+            len = ((len << 1) | (data[i] & 1)) >>> 0; 
+            bitIdx++;
+        }
+
+        const maxBytes = Math.floor(((data.length / 4) * 3) / 8);
+        if (len <= 0 || len > maxBytes) throw new Error("No pixel data found or image compressed.");
+
+        const payload = new Uint8Array(len);
+        bitIdx = 0;
+
+        for (; i < data.length && bitIdx < len * 8; i++) {
+            if ((i + 1) % 4 === 0) continue;
+            const bit = data[i] & 1;
+            const byteIdx = Math.floor(bitIdx / 8);
+            const bitInByte = 7 - (bitIdx % 8);
+            if (bit) payload[byteIdx] |= (1 << bitInByte);
+            bitIdx++;
+        }
+        return payload;
+    }
+
+    // --- Video/Audio EOF Engine (Container Wrap) ---
+    async function hideInEOF(file, payload) {
+        const original = new Uint8Array(await file.arrayBuffer());
+        const lenBuf = new Uint8Array(4);
+        new DataView(lenBuf.buffer).setUint32(0, payload.length, true);
+
+        const finalFile = new Uint8Array(original.length + payload.length + 4 + SIG_BYTES.length);
+        finalFile.set(original, 0);
+        finalFile.set(payload, original.length);
+        finalFile.set(lenBuf, original.length + payload.length);
+        finalFile.set(SIG_BYTES, original.length + payload.length + 4);
+
+        return finalFile.buffer;
+    }
+</script>
+</body>
+</html>
