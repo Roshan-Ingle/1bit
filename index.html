@@ -2,176 +2,219 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1bit.sbs | Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>1bit.sbs | Future Vibe Coded</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+        /* --- iOS Premium & Glassmorphism Variables --- */
+        :root {
+            /* Apple System Fonts */
+            --font-ios: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Glassmorphism Colors */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-color: #0a84ff; /* iOS Blue */
+            --accent-hover: #0070e0;
+        }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            background-color: #000000; /* True Black */
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-ios);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            overflow: hidden;
-            position: relative;
-            ::selection { background: #333; color: #fff; }
+            padding: 2rem 1.2rem;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            
+            /* Premium Dark Animated Background */
+            background-color: #000000;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(20, 30, 70, 0.6), transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(40, 15, 60, 0.6), transparent 50%);
+            background-attachment: fixed;
         }
 
-        /* Subtle cinematic top glow */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Minimalist Wireframe Container - Centered */
         .container {
-            position: relative;
-            z-index: 1;
-            max-width: 500px;
             width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+            padding-bottom: 4rem;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centers elements */
-            text-align: center; /* Centers text */
-            gap: 24px;
-            animation: slowFade 1.5s ease forwards;
+            gap: 1.5rem; /* Space between glass cards */
         }
 
-        .header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
+        /* --- Glassmorphism Card Style --- */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px); /* For iOS Safari */
+            border: 1px solid var(--glass-border);
+            border-radius: 24px; /* iOS style rounded corners */
+            padding: 2rem;
+            box-shadow: var(--glass-shadow);
         }
 
-        .badge {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .domain {
-            font-size: 3rem;
-            font-weight: 400;
-            letter-spacing: -1.5px;
-            background: linear-gradient(180deg, #FFFFFF 0%, #777777 100%);
+        /* --- Typography --- */
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, #a5a5a5);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .tagline {
-            font-size: 1rem;
-            font-weight: 300;
-            color: #888888;
-            line-height: 1.6;
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: -0.4px;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
         }
 
-        /* Sleek Separator - Fades on both ends */
-        .divider {
-            height: 1px;
-            width: 80%;
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
-            margin: 16px 0;
+        p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 1.2rem;
         }
 
-        /* Profile Section - Vertically Stacked & Centered */
-        .profile {
-            display: flex;
-            flex-direction: column; 
-            align-items: center;
-            gap: 12px;
+        p:last-child {
+            margin-bottom: 0;
         }
 
-        .avatar {
-            width: 64px; 
-            height: 64px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.15); /* Subtle rim */
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
-        .info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .name {
-            font-size: 1rem;
+        /* Highlighted intro block */
+        .intro-text {
+            font-size: 1.2rem;
+            color: var(--text-primary);
             font-weight: 500;
-            color: #eeeeee;
+            line-height: 1.5;
+            margin-top: 1rem;
         }
 
-        .email {
-            font-size: 0.85rem;
-            color: #555555;
+        /* --- Lists --- */
+        ul {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 1.05rem;
+        }
+
+        li::before {
+            content: "•";
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -4px;
+        }
+
+        /* --- Links & Buttons (iOS Style) --- */
+        .ios-link {
+            color: var(--accent-color);
             text-decoration: none;
-            transition: color 0.3s ease;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+            display: inline-block;
+            margin-bottom: 1.5rem;
         }
 
-        .email:hover {
-            color: #aaaaaa;
+        .ios-link:active {
+            opacity: 0.6;
         }
 
-        /* Ghost Button for Coffee - Centered */
-        .coffee-btn {
-            display: inline-flex;
+        .support-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .ios-button {
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            color: #aaaaaa;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
             text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 400;
-            transition: all 0.3s ease;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            border: 1px solid var(--glass-border);
+            transition: all 0.2s ease;
+            margin-top: 1rem;
         }
 
-        .coffee-btn svg {
-            width: 14px;
-            height: 14px;
-            fill: currentColor;
-            opacity: 0.7;
+        .ios-button:active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(0.98);
         }
 
-        .coffee-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+        /* --- Signature --- */
+        .signature {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-size: 1rem;
         }
 
-        @keyframes slowFade {
-            0% { opacity: 0; filter: blur(10px); transform: translateY(10px); }
-            100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+        /* --- Cinematic Reveal Animations --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            animation: iosSpringFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        @media (max-width: 480px) {
-            .domain { font-size: 2.5rem; }
-            .coffee-btn { width: 100%; }
+        @keyframes iosSpringFade {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Staggered delays */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
+        .delay-4 { animation-delay: 0.7s; }
+        .delay-5 { animation-delay: 0.9s; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .glass-card {
+                padding: 1.5rem;
+                border-radius: 20px;
+            }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.2rem; }
+            p, li { font-size: 1rem; }
         }
     </style>
 </head>
@@ -179,29 +222,60 @@
 
     <div class="container">
         
-        <div class="header">
-            <span class="badge">Parent Domain</span>
-            <h1 class="domain">1bit.sbs</h1>
-            <p class="tagline">Acting as the central hub for future digital projects and initiatives.</p>
-        </div>
+        <!-- Header Card -->
+        <header class="glass-card reveal delay-1">
+            <h1>1bit.sbs</h1>
+            <p class="intro-text">
+                Welcome to the digital home of 1bit.sbs. This is a space where logic meets rhythm, and code becomes a feeling.
+            </p>
+        </header>
 
-        <div class="divider"></div>
+        <!-- Section 1 -->
+        <section class="glass-card reveal delay-2">
+            <h2>The Vision</h2>
+            <p><strong>1bit.sbs</strong> is the parent domain and the creative heartbeat for a series of upcoming "vibe-coded" projects. In a world of rigid structures and dry technicalities, this space exists to explore the intersection of technology, aesthetics, and pure intuition.</p>
+            <p>This isn't just about building software; it’s about crafting digital experiences that resonate. Every project launched under this banner is a step toward a future where code feels more like art and less like a chore.</p>
+        </section>
 
-        <div class="profile">
-            <!-- Updated full color image placed on top -->
-            <img src="https://i.ibb.co/PGKd3RNn/Screenshot-2026-03-28-20-28-17-99-99c04817c0de5652397fc8b56c3b3817.jpg" alt="Roshan Ingle" class="avatar">
-            <div class="info">
-                <span class="name">Roshan Ingle</span>
-                <a href="mailto:alwaysroshanpatil@gmail.com" class="email">alwaysroshanpatil@gmail.com</a>
+        <!-- Section 2 -->
+        <section class="glass-card reveal delay-3">
+            <h2>The Mind Behind the Machine</h2>
+            <p>I’m <strong>Roshan Ingle</strong>. To be honest, I don’t call myself a "technical expert" or a traditional developer. I am a learner, a builder, and a believer in Vibe Coding.</p>
+            <p>For me, the process is simple: I have a vision for how something should feel, and I use code as the medium to bring that vibe to life. I’m currently in the lab—learning the ropes, breaking things, and rebuilding them—all to ensure that every project under 1bit.sbs carries a unique digital soul.</p>
+            <p>And here is the best part: <strong>I am doing all of this from my 7-year-old Realme 3 Pro phone.</strong> Even this very website was vibe-coded entirely on a mobile screen. It’s proof that you don't need high-end gear to build something that feels right.</p>
+        </section>
+
+        <!-- Section 3 -->
+        <section class="glass-card reveal delay-4">
+            <h2>What to Expect</h2>
+            <p>Since this is the parent hub, you’ll find all my future experiments hosted here. These projects will focus on:</p>
+            <ul>
+                <li><strong>Minimalist Design:</strong> Clean, "1-bit" inspired aesthetics.</li>
+                <li><strong>Atmospheric Utility:</strong> Tools and sites that don't just work, but feel good to use.</li>
+                <li><strong>Continuous Evolution:</strong> As I learn, the projects grow. This is a living portfolio of progress.</li>
+            </ul>
+        </section>
+
+        <!-- Section 4 (Contact & Support) -->
+        <footer class="glass-card reveal delay-5">
+            <h2>Let’s Connect</h2>
+            <p>The future is coded, but the connection is human. If you're into the vibe, stay tuned. There is a lot more coming soon.</p>
+            
+            <a href="mailto:alwaysroshanpatil@gmail.com" class="ios-link">alwaysroshanpatil@gmail.com</a>
+
+            <div class="support-section">
+                <p>If you like the vibe, consider supporting the lab:</p>
+                <!-- UPI Protocol Link: Opens GPay, PhonePe, Paytm, etc. on mobile -->
+                <a href="upi://pay?pa=alwaysroshanpatil@oksbi&pn=Roshan%20Ingle&cu=INR" class="ios-button">
+                    ☕ Buy me a coffee (UPI)
+                </a>
             </div>
-        </div>
 
-        <a href="upi://pay?pa=Q968343371@ybl&pn=Roshan%20Ingle&tn=Buy%20me%20a%20coffee&cu=INR" class="coffee-btn">
-            <svg viewBox="0 0 24 24">
-                <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.9 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/>
-            </svg>
-            Buy me a coffee
-        </a>
+            <div class="signature">
+                Stay Wired.<br>
+                <strong>— Roshan Ingle</strong>
+            </div>
+        </footer>
 
     </div>
 
