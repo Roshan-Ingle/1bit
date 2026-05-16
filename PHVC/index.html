@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Project Handshake VoiceCalll</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Pure Black, Minimalist Theme */
+        body, html {
+            margin: 0; padding: 0;
+            background-color: #000000; color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            height: 100dvh; width: 100vw;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; box-sizing: border-box;
+        }
+
+        *, *:before, *:after { box-sizing: border-box; }
+
+        .screen { 
+            display: none; width: 100%; max-width: 400px; 
+            padding: 20px; padding-bottom: max(20px, env(safe-area-inset-bottom)); 
+            text-align: center; height: 100%; flex-direction: column; justify-content: center;
+        }
+        .screen.active { display: flex; }
+
+        /* Typography & Labels */
+        .label { font-size: 12px; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .label.red { color: #ff3b30; }
+        .label.blue { color: #0a84ff; }
+        
+        #peer-name { font-size: 20px; font-weight: 500; margin-bottom: 5px; color: #ffffff; letter-spacing: 0.5px; }
+        .timer-display { font-size: 48px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -1px; margin-bottom: 5px; }
+        .status-display { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
+        .status-display.recording { color: #ff3b30; animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Inputs & Textareas */
+        textarea, input[type="text"] {
+            width: 100%; background: #000000; border: 1px solid #333333;
+            color: #ffffff; padding: 12px; font-family: monospace; font-size: 12px;
+            resize: none; outline: none; border-radius: 0; box-sizing: border-box;
+        }
+        textarea { height: 90px; word-break: break-all; }
+        textarea.red-string { color: #ff3b30; border-color: rgba(255, 59, 48, 0.3); }
+        textarea.blue-string { color: #0a84ff; border-color: rgba(10, 132, 255, 0.3); }
+        textarea:focus, input[type="text"]:focus { border-color: #ffffff; }
+
+        /* Buttons */
+        button {
+            width: 100%; background: #ffffff; color: #000000; border: none; padding: 16px;
+            font-size: 14px; font-weight: 500; font-family: 'Inter', sans-serif; cursor: pointer;
+            border-radius: 0; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
+        }
+        button:active { opacity: 0.7; transform: scale(0.98); }
+        button:disabled { background: #222; color: #555; cursor: not-allowed; }
+
+        /* Action Buttons (Call Controls) */
+        .call-controls { display: flex; flex-direction: column; gap: 12px; }
+        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        .btn-outline { background: transparent; border: 1px solid #333; color: #fff; }
+        .btn-outline:hover { border-color: #888; }
+        .btn-outline.active { background: #ffffff; color: #000000; border-color: #ffffff; }
+        
+        .btn-danger { background: transparent; border: 1px solid rgba(255, 59, 48, 0.4); color: #ff3b30; }
+        .btn-danger:active { background: rgba(255, 59, 48, 0.1); }
+        
+        .btn-record.recording { background: rgba(255, 59, 48, 0.1); border-color: #ff3b30; color: #ff3b30; }
+    </style>
+</head>
+<body>
+
+    <!-- Audio Element to play peer's voice -->
+    <audio id="remote-audio" autoplay></audio>
+
+    <!-- SCREEN 1: Role Selection -->
+    <div id="screen-1" class="screen active">
+        <div>
+            <button id="btn-host">Start Call</button>
+            <button id="btn-guest" style="margin-top: 15px;">Join Call</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: START CALL (HOST) -->
+    <div id="screen-2-host" class="screen">
+        <div style="margin-bottom: 20px;">
+            <div class="label">Enter Name</div>
+            <input type="text" id="host-name" placeholder="Your Name..." autocomplete="off" style="text-align: center; font-family: 'Inter', sans-serif;">
+        </div>
+        <div>
+            <button id="host-generate" style="margin-bottom: 10px;">Generate Red Code</button>
+            <textarea id="host-red" class="red-string" readonly placeholder="Waiting..."></textarea>
+            <button id="host-copy-red" style="margin-top: 10px;" disabled>Copy</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <div class="label blue">Paste Blue Code</div>
+            <textarea id="host-blue" class="blue-string" placeholder="Paste blue code here..."></textarea>
+            <button id="host-connect" style="margin-top: 10px;">Connect</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: JOIN CALL (GUEST) -->
+    <div id="screen-2-guest" class="screen">
+        <div style="margin-bottom: 20px;">
+            <div class="label">Enter Name</div>
+            <input type="text" id="guest-name" placeholder="Your Name..." autocomplete="off" style="text-align: center; font-family: 'Inter', sans-serif;">
+        </div>
+        <div>
+            <div class="label red">Enter Red Code</div>
+            <textarea id="guest-red" class="red-string" placeholder="Paste red code here..."></textarea>
+            <button id="guest-process" style="margin-top: 10px;">Generate Blue Code</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <textarea id="guest-blue" class="blue-string" readonly placeholder="Waiting..."></textarea>
+            <button id="guest-copy-blue" style="margin-top: 10px;" disabled>Copy</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: CALL INTERFACE -->
+    <div id="screen-3" class="screen">
+        <div>
+            <div id="peer-name">Unknown</div>
+            <div id="timer" class="timer-display">00:00</div>
+            <div id="call-status" class="status-display">Connected</div>
+        </div>
+
+        <div class="call-controls">
+            <div class="control-grid">
+                <button id="btn-mute" class="btn-outline">Mute Mic</button>
+                <button id="btn-speaker" class="btn-outline" title="Turn off to stop echo in 2-tab testing">Speaker On</button>
+            </div>
+            <button id="btn-record" class="btn-outline btn-record">Record</button>
+            <button id="btn-hangup" class="btn-danger">Hang Up</button>
+        </div>
+    </div>
+
+    <script>
+        // --- State Variables ---
+        const rtcConfig = { iceServers: [] }; // STUN-less constraint
+        let pc = null;
+        let dc = null; 
+        let isHost = false;
+        
+        let localStream = null;
+        let remoteStream = null;
+        
+        let callStartTime = null;
+        let timerInterval = null;
+        
+        let isMuted = false;
+        let isSpeakerMuted = false;
+        
+        // Recording State
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        let audioContext = null;
+
+        // --- UI Navigation ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- SDP Manipulation: Force High-Fidelity Audio ---
+        // Disables DTX (preventing voice drops) and forces max 510kbps bitrate.
+        function forceHighQualityAudio(sdp) {
+            let modifiedSdp = sdp;
+            // Find the Opus payload type
+            const match = modifiedSdp.match(/a=rtpmap:(\d+) opus\/48000\/2/);
+            if (match) {
+                const pt = match[1];
+                const fmtpRegex = new RegExp(`a=fmtp:${pt} (.*)`);
+                // Inject ultimate quality parameters: stereo, max bitrate, constant bitrate, no discontinuous transmission, forward error correction
+                const highQualityParams = `a=fmtp:${pt} stereo=1; sprop-stereo=1; maxaveragebitrate=510000; cbr=1; usedtx=0; useinbandfec=1`;
+                
+                if (fmtpRegex.test(modifiedSdp)) {
+                    modifiedSdp = modifiedSdp.replace(fmtpRegex, highQualityParams);
+                } else {
+                    modifiedSdp += `${highQualityParams}\r\n`;
+                }
+            }
+            return modifiedSdp;
+        }
+
+        // --- Media Access (Raw, Unfiltered Audio) ---
+        async function getMicrophone() {
+            try {
+                return await navigator.mediaDevices.getUserMedia({ 
+                    audio: { 
+                        echoCancellation: true,      // Kept true to avoid massive feedback if no headphones are used
+                        noiseSuppression: false,     // DISABLED: Fixes muffled/robotic sounding voice
+                        autoGainControl: false,      // DISABLED: Fixes volume pumping and clipping drops
+                        sampleRate: 48000,
+                        channelCount: 2 
+                    }, 
+                    video: false 
+                });
+            } catch (err) {
+                alert("Microphone access is strictly required to make a voice call.");
+                throw err;
+            }
+        }
+
+        // --- WebRTC Core Setup ---
+        function initWebRTC() {
+            pc = new RTCPeerConnection(rtcConfig);
+            
+            if (isHost) {
+                dc = pc.createDataChannel("meta");
+                setupDataChannel();
+            } else {
+                pc.ondatachannel = (e) => {
+                    dc = e.channel;
+                    setupDataChannel();
+                };
+            }
+
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+            pc.ontrack = (event) => {
+                remoteStream = event.streams[0];
+                document.getElementById('remote-audio').srcObject = remoteStream;
+            };
+
+            pc.onconnectionstatechange = () => {
+                if (pc.connectionState === 'connected') {
+                    showScreen('screen-3');
+                    startTimer();
+                    document.getElementById('call-status').innerText = 'Connected (High-Fidelity)';
+                } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                    handleHangup();
+                }
+            };
+        }
+
+        function setupDataChannel() {
+            dc.onopen = () => {
+                const myName = isHost ? document.getElementById('host-name').value.trim() : document.getElementById('guest-name').value.trim();
+                dc.send(JSON.stringify({ type: 'name', value: myName || (isHost ? 'Host' : 'Guest') }));
+            };
+            dc.onmessage = (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'name') {
+                        document.getElementById('peer-name').innerText = data.value;
+                    }
+                } catch(err) {}
+            };
+        }
+
+        // ==========================================
+        // SCREEN 1 ACTIONS
+        // ==========================================
+        document.getElementById('btn-host').addEventListener('click', () => {
+            isHost = true;
+            showScreen('screen-2-host');
+        });
+
+        document.getElementById('btn-guest').addEventListener('click', () => {
+            isHost = false;
+            showScreen('screen-2-guest');
+        });
+
+        // ==========================================
+        // HOST FLOW (START CALL)
+        // ==========================================
+        document.getElementById('host-generate').addEventListener('click', async () => {
+            try {
+                document.getElementById('host-red').value = "Requesting microphone...";
+                localStream = await getMicrophone();
+                initWebRTC();
+
+                pc.onicecandidate = (e) => {
+                    if (e.candidate === null) {
+                        document.getElementById('host-red').value = btoa(JSON.stringify(pc.localDescription));
+                        document.getElementById('host-copy-red').disabled = false;
+                        document.getElementById('host-generate').innerText = "Generated";
+                    }
+                };
+                
+                const offer = await pc.createOffer();
+                // Override standard WebRTC audio with Studio Quality params
+                offer.sdp = forceHighQualityAudio(offer.sdp); 
+                await pc.setLocalDescription(offer);
+            } catch (err) { document.getElementById('host-red').value = ""; }
+        });
+
+        document.getElementById('host-copy-red').addEventListener('click', () => {
+            const el = document.getElementById('host-red'); el.select(); navigator.clipboard.writeText(el.value);
+            document.getElementById('host-copy-red').innerText = "Copied";
+        });
+
+        document.getElementById('host-connect').addEventListener('click', async () => {
+            try {
+                const answer = JSON.parse(atob(document.getElementById('host-blue').value.trim()));
+                await pc.setRemoteDescription(new RTCSessionDescription(answer));
+                document.getElementById('host-connect').innerText = "Connecting...";
+            } catch (err) { alert("Invalid Blue Code."); }
+        });
+
+        // ==========================================
+        // GUEST FLOW (JOIN CALL)
+        // ==========================================
+        document.getElementById('guest-process').addEventListener('click', async () => {
+            try {
+                const offerStr = document.getElementById('guest-red').value.trim();
+                if (!offerStr) return alert("Please enter the Red Code first.");
+
+                document.getElementById('guest-blue').value = "Requesting microphone...";
+                localStream = await getMicrophone();
+                initWebRTC();
+
+                const offer = JSON.parse(atob(offerStr));
+                await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                
+                pc.onicecandidate = (e) => {
+                    if (e.candidate === null) {
+                        document.getElementById('guest-blue').value = btoa(JSON.stringify(pc.localDescription));
+                        document.getElementById('guest-copy-blue').disabled = false;
+                        document.getElementById('guest-process').innerText = "Processed";
+                    }
+                };
+                const answer = await pc.createAnswer();
+                // Override standard WebRTC audio with Studio Quality params
+                answer.sdp = forceHighQualityAudio(answer.sdp); 
+                await pc.setLocalDescription(answer);
+            } catch (err) { alert("Invalid Red Code or Microphone Denied."); document.getElementById('guest-blue').value = ""; }
+        });
+
+        document.getElementById('guest-copy-blue').addEventListener('click', () => {
+            const el = document.getElementById('guest-blue'); el.select(); navigator.clipboard.writeText(el.value);
+            document.getElementById('guest-copy-blue').innerText = "Copied";
+        });
+
+        // ==========================================
+        // CALL FEATURES (SCREEN 3)
+        // ==========================================
+
+        // 1. Timer
+        function startTimer() {
+            callStartTime = Date.now();
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+                const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const secs = String(elapsed % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            document.getElementById('timer').innerText = "00:00";
+        }
+
+        // 2. Mute Microphone
+        document.getElementById('btn-mute').addEventListener('click', () => {
+            if (!localStream) return;
+            isMuted = !isMuted;
+            localStream.getAudioTracks()[0].enabled = !isMuted;
+            
+            const btn = document.getElementById('btn-mute');
+            btn.innerText = isMuted ? "Unmute Mic" : "Mute Mic";
+            if (isMuted) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
+        // 3. Mute Speaker (For testing 2 tabs on same device)
+        document.getElementById('btn-speaker').addEventListener('click', () => {
+            isSpeakerMuted = !isSpeakerMuted;
+            document.getElementById('remote-audio').muted = isSpeakerMuted;
+            
+            const btn = document.getElementById('btn-speaker');
+            btn.innerText = isSpeakerMuted ? "Speaker Off" : "Speaker On";
+            if (isSpeakerMuted) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
+        // 4. Record
+        document.getElementById('btn-record').addEventListener('click', () => {
+            if (!isRecording) startRecording();
+            else stopRecording();
+        });
+
+        function startRecording() {
+            if (!localStream || !remoteStream) return alert("Connection not fully established.");
+            
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const destination = audioContext.createMediaStreamDestination();
+
+            audioContext.createMediaStreamSource(localStream).connect(destination);
+            audioContext.createMediaStreamSource(remoteStream).connect(destination);
+
+            recordedChunks = [];
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
+            mediaRecorder = new MediaRecorder(destination.stream, { mimeType });
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `Handshake_VoiceCall_${Date.now()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(url);
+                audioContext.close();
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            
+            const btn = document.getElementById('btn-record');
+            btn.innerText = "Stop Recording";
+            btn.classList.add('recording');
+            
+            const status = document.getElementById('call-status');
+            status.innerText = "Recording...";
+            status.classList.add('recording');
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            isRecording = false;
+            
+            const btn = document.getElementById('btn-record');
+            btn.innerText = "Record";
+            btn.classList.remove('recording');
+            
+            const status = document.getElementById('call-status');
+            status.innerText = "Connected (High-Fidelity)";
+            status.classList.remove('recording');
+        }
+
+        // 5. Hang Up
+        document.getElementById('btn-hangup').addEventListener('click', handleHangup);
+
+        function handleHangup() {
+            if (isRecording) stopRecording();
+            
+            if (dc) { dc.close(); dc = null; }
+            if (pc) { pc.close(); pc = null; }
+            if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+            if (remoteStream) { remoteStream.getTracks().forEach(t => t.stop()); remoteStream = null; }
+            
+            document.getElementById('remote-audio').srcObject = null;
+            document.getElementById('peer-name').innerText = 'Unknown';
+            
+            stopTimer();
+            
+            // Reset Mic Mute
+            isMuted = false;
+            document.getElementById('btn-mute').classList.remove('active');
+            document.getElementById('btn-mute').innerText = "Mute Mic";
+
+            // Reset Speaker Mute
+            isSpeakerMuted = false;
+            document.getElementById('remote-audio').muted = false;
+            document.getElementById('btn-speaker').classList.remove('active');
+            document.getElementById('btn-speaker').innerText = "Speaker On";
+
+            // Reset UI inputs
+            document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+            document.getElementById('host-copy-red').disabled = true;
+            document.getElementById('guest-copy-blue').disabled = true;
+            document.getElementById('host-generate').innerText = "Generate Red Code";
+            document.getElementById('guest-process').innerText = "Generate Blue Code";
+            document.getElementById('host-connect').innerText = "Connect";
+            document.getElementById('call-status').innerText = "Connecting...";
+            
+            showScreen('screen-1');
+        }
+    </script>
+</body>
+</html>
