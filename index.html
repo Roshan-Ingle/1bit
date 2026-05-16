@@ -2,26 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>1bit.sbs | Future Vibe Coded</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roshan | Vibe Coded</title>
     <style>
-        /* --- iOS Premium & Glassmorphism Variables --- */
-        :root {
-            /* Apple System Fonts */
-            --font-ios: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            
-            /* Glassmorphism Colors */
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            
-            /* Text Colors */
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --accent-color: #0a84ff; /* iOS Blue */
-            --accent-hover: #0070e0;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -29,192 +12,102 @@
         }
 
         body {
-            font-family: var(--font-ios);
-            color: var(--text-primary);
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
-            min-height: 100vh;
+            padding: 2rem 1.5rem;
             display: flex;
             justify-content: center;
-            padding: 2rem 1.2rem;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            
-            /* Premium Dark Animated Background */
-            background-color: #000000;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(20, 30, 70, 0.6), transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(40, 15, 60, 0.6), transparent 50%);
-            background-attachment: fixed;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
+            max-width: 520px;
             width: 100%;
-            max-width: 680px;
-            margin: 0 auto;
-            padding-bottom: 4rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem; /* Space between glass cards */
         }
 
-        /* --- Glassmorphism Card Style --- */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px); /* For iOS Safari */
-            border: 1px solid var(--glass-border);
-            border-radius: 24px; /* iOS style rounded corners */
-            padding: 2rem;
-            box-shadow: var(--glass-shadow);
+        header {
+            margin-bottom: 2.5rem;
         }
 
-        /* --- Typography --- */
         h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.8px;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #fff, #a5a5a5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        h2 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            letter-spacing: -0.4px;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        p {
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-            margin-bottom: 1.2rem;
-        }
-
-        p:last-child {
-            margin-bottom: 0;
-        }
-
-        strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        /* Highlighted intro block */
-        .intro-text {
-            font-size: 1.2rem;
-            color: var(--text-primary);
+            font-size: 1.25rem;
             font-weight: 500;
-            line-height: 1.5;
-            margin-top: 1rem;
+            letter-spacing: -0.02em;
+            color: #ffffff;
         }
 
-        /* --- Lists --- */
-        ul {
-            list-style: none;
-            margin-top: 0.5rem;
+        .subtitle {
+            color: #707070;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
         }
 
-        li {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-            position: relative;
-            font-size: 1.05rem;
-        }
-
-        li::before {
-            content: "•";
-            color: var(--accent-color);
-            font-size: 1.5rem;
-            position: absolute;
-            left: 0;
-            top: -4px;
-        }
-
-        /* --- Links & Buttons (iOS Style) --- */
-        .ios-link {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.2s ease;
-            display: inline-block;
+        main p {
+            font-size: 0.95rem;
+            color: #e0e0e0;
             margin-bottom: 1.5rem;
+            font-weight: 400;
         }
 
-        .ios-link:active {
-            opacity: 0.6;
-        }
-
-        .support-section {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--glass-border);
-        }
-
-        .ios-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            text-decoration: none;
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: 1.05rem;
-            border: 1px solid var(--glass-border);
-            transition: all 0.2s ease;
-            margin-top: 1rem;
-        }
-
-        .ios-button:active {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(0.98);
-        }
-
-        /* --- Signature --- */
-        .signature {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--glass-border);
-            color: var(--text-secondary);
+        .emoji {
             font-size: 1rem;
+            margin-left: 0.2rem;
         }
 
-        /* --- Cinematic Reveal Animations --- */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px) scale(0.98);
-            animation: iosSpringFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        hr {
+            border: 0;
+            border-top: 1px solid #1a1a1a;
+            margin: 2.5rem 0;
         }
 
-        @keyframes iosSpringFade {
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #505050;
+            margin-bottom: 1rem;
+            font-weight: 600;
         }
 
-        /* Staggered delays */
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.3s; }
-        .delay-3 { animation-delay: 0.5s; }
-        .delay-4 { animation-delay: 0.7s; }
-        .delay-5 { animation-delay: 0.9s; }
+        .links-list {
+            list-style: none;
+        }
 
-        /* Mobile Adjustments */
-        @media (max-width: 600px) {
-            .glass-card {
-                padding: 1.5rem;
-                border-radius: 20px;
-            }
-            h1 { font-size: 1.8rem; }
-            h2 { font-size: 1.2rem; }
-            p, li { font-size: 1rem; }
+        .links-list li {
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .links-list a {
+            color: #ffffff;
+            text-decoration: none;
+            border-bottom: 1px solid #333333;
+            transition: border-color 0.2s ease, color 0.2s ease;
+            padding-bottom: 2px;
+        }
+
+        .links-list a:hover {
+            color: #a0a0a0;
+            border-bottom-color: #ffffff;
+        }
+
+        .meta-text {
+            color: #707070;
+            font-size: 0.85rem;
+        }
+
+        .upi-box {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            padding: 0.75rem 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #a0a0a0;
+            display: inline-block;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
@@ -222,60 +115,48 @@
 
     <div class="container">
         
-        <!-- Header Card -->
-        <header class="glass-card reveal delay-1">
-            <h1>1bit.sbs</h1>
-            <p class="intro-text">
-                Welcome to the digital home of 1bit.sbs. This is a space where logic meets rhythm, and code becomes a feeling.
-            </p>
+        <header>
+            <h1>hello! i'm roshan.</h1>
+            <p class="subtitle">vibe coded from a smartphone</p>
         </header>
 
-        <!-- Section 1 -->
-        <section class="glass-card reveal delay-2">
-            <h2>The Vision</h2>
-            <p><strong>1bit.sbs</strong> is the parent domain and the creative heartbeat for a series of upcoming "vibe-coded" projects. In a world of rigid structures and dry technicalities, this space exists to explore the intersection of technology, aesthetics, and pure intuition.</p>
-            <p>This isn't just about building software; it’s about crafting digital experiences that resonate. Every project launched under this banner is a step toward a future where code feels more like art and less like a chore.</p>
+        <main>
+            <p>this is a space where i host my vibe-coded projects.</p>
+            
+            <p>i vibe-code these projects from my 7-year-old realme 3 pro smartphone.</p>
+            
+            <p>even this site is vibe-coded <span class="emoji">😅</span></p>
+            
+            <p>i don't have any degree or deep understanding of programming languages.</p>
+            
+            <p>but i like giving life to my ideas that don't let me sleep at night.</p>
+            
+            <p>i have limited resources with unlimited ideas.</p>
+            
+            <p>so if you want to be part of my vibe-coding journey, just try using my projects and give me feedback <span class="emoji">😋</span></p>
+            
+            <p class="meta-text">thanks for reading this long text in this era where the attention span of humans is lower than a goldfish.</p>
+        </main>
+
+        <hr>
+
+        <section>
+            <h2 class="section-title">support my work</h2>
+            <p>if you have money to spend... <span class="emoji">💰</span> buy me a coffee and help me pay my domain and hosting fees.</p>
+            <div class="upi-box">UPI ID: alwaysroshanpatil@oksbi</div>
         </section>
 
-        <!-- Section 2 -->
-        <section class="glass-card reveal delay-3">
-            <h2>The Mind Behind the Machine</h2>
-            <p>I’m <strong>Roshan Ingle</strong>. To be honest, I don’t call myself a "technical expert" or a traditional developer. I am a learner, a builder, and a believer in Vibe Coding.</p>
-            <p>For me, the process is simple: I have a vision for how something should feel, and I use code as the medium to bring that vibe to life. I’m currently in the lab—learning the ropes, breaking things, and rebuilding them—all to ensure that every project under 1bit.sbs carries a unique digital soul.</p>
-            <p>And here is the best part: <strong>I am doing all of this from my 7-year-old Realme 3 Pro phone.</strong> Even this very website was vibe-coded entirely on a mobile screen. It’s proof that you don't need high-end gear to build something that feels right.</p>
-        </section>
+        <hr>
 
-        <!-- Section 3 -->
-        <section class="glass-card reveal delay-4">
-            <h2>What to Expect</h2>
-            <p>Since this is the parent hub, you’ll find all my future experiments hosted here. These projects will focus on:</p>
-            <ul>
-                <li><strong>Minimalist Design:</strong> Clean, "1-bit" inspired aesthetics.</li>
-                <li><strong>Atmospheric Utility:</strong> Tools and sites that don't just work, but feel good to use.</li>
-                <li><strong>Continuous Evolution:</strong> As I learn, the projects grow. This is a living portfolio of progress.</li>
+        <section>
+            <h2 class="section-title">connect</h2>
+            <p class="meta-text" style="margin-bottom: 1rem;">if you want to chat, give suggestions, or just say hi. don't call—i'm an introvert, so i'll most probably reject the call.</p>
+            
+            <ul class="links-list">
+                <li><a href="https://wa.me/918468958778" target="_blank" rel="noopener">WhatsApp: +91 8468958778</a></li>
+                <li><a href="mailto:alwaysroshanpatil@gmail.com">Email: alwaysroshanpatil@gmail.com</a></li>
             </ul>
         </section>
-
-        <!-- Section 4 (Contact & Support) -->
-        <footer class="glass-card reveal delay-5">
-            <h2>Let’s Connect</h2>
-            <p>The future is coded, but the connection is human. If you're into the vibe, stay tuned. There is a lot more coming soon.</p>
-            
-            <a href="mailto:alwaysroshanpatil@gmail.com" class="ios-link">alwaysroshanpatil@gmail.com</a>
-
-            <div class="support-section">
-                <p>If you like the vibe, consider supporting the lab:</p>
-                <!-- UPI Protocol Link: Opens GPay, PhonePe, Paytm, etc. on mobile -->
-                <a href="upi://pay?pa=alwaysroshanpatil@oksbi&pn=Roshan%20Ingle&cu=INR" class="ios-button">
-                    ☕ Buy me a coffee (UPI)
-                </a>
-            </div>
-
-            <div class="signature">
-                Stay Wired.<br>
-                <strong>— Roshan Ingle</strong>
-            </div>
-        </footer>
 
     </div>
 
