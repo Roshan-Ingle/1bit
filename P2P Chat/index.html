@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>P2P Minimal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Pure Black, Minimalist Theme */
+        body, html {
+            margin: 0; padding: 0;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            height: 100dvh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Screen Controller */
+        .screen { display: none; width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; text-align: center; }
+        .screen.active { display: flex; flex-direction: column; gap: 20px; }
+
+        /* Typography & Labels */
+        .label { font-size: 12px; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .label.red { color: #ff3b30; }
+        .label.blue { color: #0a84ff; }
+
+        /* Inputs & Textareas */
+        textarea, input[type="text"] {
+            width: 100%;
+            background: #000000;
+            border: 1px solid #333333;
+            color: #ffffff;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+            border-radius: 0; /* Sharp minimal edges */
+        }
+        textarea { height: 90px; word-break: break-all; }
+        textarea.red-string { color: #ff3b30; border-color: rgba(255, 59, 48, 0.3); }
+        textarea.blue-string { color: #0a84ff; border-color: rgba(10, 132, 255, 0.3); }
+        
+        textarea:focus, input[type="text"]:focus { border-color: #ffffff; }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.2s;
+        }
+        button:active { opacity: 0.7; }
+        button:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        /* Screen 3: Chat Interface */
+        #screen-3 { height: 100%; max-width: 600px; justify-content: flex-start; padding-top: 30px; }
+        #chat-box {
+            flex: 1; overflow-y: auto; text-align: left;
+            display: flex; flex-direction: column; gap: 12px;
+            margin-bottom: 20px; font-size: 14px;
+            scrollbar-width: none; /* Hide scrollbar */
+        }
+        #chat-box::-webkit-scrollbar { display: none; }
+        
+        .msg { line-height: 1.5; word-wrap: break-word; }
+        .msg span.sender { font-weight: 500; margin-right: 8px; }
+        .msg span.sender.you { color: #888888; }
+        .msg span.sender.peer { color: #ffffff; }
+        .msg.system { color: #555555; font-size: 12px; text-align: center; font-style: italic; }
+        
+        .file-link { color: #ffffff; text-decoration: underline; font-family: monospace; }
+
+        .input-row { display: flex; gap: 10px; width: 100%; }
+        .input-row input { flex: 1; }
+        .input-row button { width: auto; padding: 0 20px; }
+        #attach-btn { background: #222; color: #fff; padding: 0 15px; }
+
+        #progress-text { font-size: 11px; color: #888; margin-top: 8px; text-align: left; display: none; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: Identity & Role Selection -->
+    <div id="screen-1" class="screen active">
+        <div>
+            <div class="label">Identity</div>
+            <input type="text" id="nickname-input" placeholder="Enter Nickname..." autocomplete="off" style="text-align: center; font-family: 'Inter', sans-serif;">
+        </div>
+        <div style="margin-top: 10px;">
+            <div class="label" style="margin-bottom: 12px;">Select Role</div>
+            <button id="btn-host">Host</button>
+            <button id="btn-guest" style="margin-top: 12px;">Guest</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: HOST -->
+    <div id="screen-2-host" class="screen">
+        <div>
+            <div class="label red">Generate String (Red String)</div>
+            <textarea id="host-red" class="red-string" readonly placeholder="Generating..."></textarea>
+            <button id="host-copy-red" style="margin-top: 10px;">Copy & Send to Guest</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <div class="label blue">Enter Guest Reply (Blue String)</div>
+            <textarea id="host-blue" class="blue-string" placeholder="Paste blue string here..."></textarea>
+            <button id="host-connect" style="margin-top: 10px;">Connect</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: GUEST -->
+    <div id="screen-2-guest" class="screen">
+        <div>
+            <div class="label red">Enter Host String (Red String)</div>
+            <textarea id="guest-red" class="red-string" placeholder="Paste red string here..."></textarea>
+            <button id="guest-process" style="margin-top: 10px;">Process</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <div class="label blue">Output (Blue String)</div>
+            <textarea id="guest-blue" class="blue-string" readonly placeholder="Waiting for processing..."></textarea>
+            <button id="guest-copy-blue" style="margin-top: 10px;">Copy & Send to Host</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: CHAT -->
+    <div id="screen-3" class="screen">
+        <div id="chat-box"></div>
+        <div id="progress-text"></div>
+        <div class="input-row">
+            <input type="file" id="file-input" style="display:none;">
+            <button id="attach-btn">+</button>
+            <input type="text" id="msg-input" placeholder="Message..." autocomplete="off">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Identity State ---
+        let myName = 'Anonymous';
+        let peerName = 'Peer';
+
+        // --- Navigation Logic ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- IndexedDB for Minimalist UI ---
+        let db;
+        const dbRequest = indexedDB.open("P2P_Minimal_DB", 2); // Incremented version for schema change
+        dbRequest.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("messages")) {
+                db.createObjectStore("messages", { keyPath: "id", autoIncrement: true });
+            }
+        };
+        dbRequest.onsuccess = (e) => { db = e.target.result; loadMessagesFromDB(); };
+
+        function saveMessage(msgObj) {
+            if (!db) return;
+            db.transaction("messages", "readwrite").objectStore("messages").add(msgObj);
+        }
+
+        function loadMessagesFromDB() {
+            if (!db) return;
+            const req = db.transaction("messages", "readonly").objectStore("messages").getAll();
+            req.onsuccess = () => {
+                req.result.forEach(msg => {
+                    // Backwards compatibility with older nameless DB records
+                    const cssType = msg.cssType || (msg.sender === 'you' ? 'you' : 'peer');
+                    const dName = msg.displayName || (cssType === 'you' ? 'You' : 'Peer');
+                    
+                    if (msg.isFile) appendFileDOM(cssType, dName, msg.fileName, msg.text);
+                    else appendMessageDOM(cssType, dName, msg.text);
+                });
+            };
+        }
+
+        // --- WebRTC Core Setup ---
+        const rtcConfig = { iceServers: [] }; // No servers
+        let pc = new RTCPeerConnection(rtcConfig);
+        let dataChannel = null;
+
+        // --- SCREEN 1 ACTIONS ---
+        function setIdentity() {
+            const inputName = document.getElementById('nickname-input').value.trim();
+            if (inputName) myName = inputName;
+        }
+
+        document.getElementById('btn-host').addEventListener('click', async () => {
+            setIdentity();
+            showScreen('screen-2-host');
+            dataChannel = pc.createDataChannel("chat");
+            setupDataChannel();
+
+            pc.onicecandidate = (e) => {
+                if (e.candidate === null) {
+                    document.getElementById('host-red').value = btoa(JSON.stringify(pc.localDescription));
+                }
+            };
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+        });
+
+        document.getElementById('btn-guest').addEventListener('click', () => {
+            setIdentity();
+            showScreen('screen-2-guest');
+            pc.ondatachannel = (e) => {
+                dataChannel = e.channel;
+                setupDataChannel();
+            };
+        });
+
+        // --- SCREEN 2: HOST ACTIONS ---
+        document.getElementById('host-copy-red').addEventListener('click', () => {
+            const el = document.getElementById('host-red');
+            el.select(); navigator.clipboard.writeText(el.value);
+            document.getElementById('host-copy-red').innerText = "Copied";
+        });
+
+        document.getElementById('host-connect').addEventListener('click', async () => {
+            const blueStr = document.getElementById('host-blue').value.trim();
+            if (!blueStr) return;
+            try {
+                const answer = JSON.parse(atob(blueStr));
+                await pc.setRemoteDescription(new RTCSessionDescription(answer));
+                document.getElementById('host-connect').innerText = "Connecting...";
+            } catch (err) { alert("Invalid Blue String."); }
+        });
+
+        // --- SCREEN 2: GUEST ACTIONS ---
+        document.getElementById('guest-process').addEventListener('click', async () => {
+            const redStr = document.getElementById('guest-red').value.trim();
+            if (!redStr) return;
+            try {
+                const offer = JSON.parse(atob(redStr));
+                await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                
+                pc.onicecandidate = (e) => {
+                    if (e.candidate === null) {
+                        document.getElementById('guest-blue').value = btoa(JSON.stringify(pc.localDescription));
+                        document.getElementById('guest-process').innerText = "Processed";
+                    }
+                };
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+            } catch (err) { alert("Invalid Red String."); }
+        });
+
+        document.getElementById('guest-copy-blue').addEventListener('click', () => {
+            const el = document.getElementById('guest-blue');
+            el.select(); navigator.clipboard.writeText(el.value);
+            document.getElementById('guest-copy-blue').innerText = "Copied";
+        });
+
+        // --- WebRTC Data Channel Logic (Chat & File) ---
+        let incomingFileMeta = null;
+        let receivedBuffers = [];
+        let receivedSize = 0;
+
+        function setupDataChannel() {
+            dataChannel.binaryType = "arraybuffer";
+            
+            dataChannel.onopen = () => {
+                showScreen('screen-3');
+                logSystem("Connected.");
+                // Immediately exchange nicknames upon connecting
+                dataChannel.send(JSON.stringify({ type: 'set-name', name: myName }));
+            };
+
+            dataChannel.onmessage = (e) => {
+                if (typeof e.data === 'string') {
+                    try {
+                        const payload = JSON.parse(e.data);
+                        if (payload.type === 'set-name') {
+                            peerName = payload.name;
+                            logSystem(`Chatting with ${peerName}`);
+                        } else if (payload.type === 'chat') {
+                            appendMessageDOM('peer', peerName, payload.text);
+                            saveMessage({ cssType: 'peer', displayName: peerName, text: payload.text, isFile: false });
+                        } else if (payload.type === 'file-meta') {
+                            incomingFileMeta = payload;
+                            receivedBuffers = []; receivedSize = 0;
+                            updateProgress(`Receiving: ${payload.name} (0%)`);
+                        }
+                    } catch (err) { 
+                        appendMessageDOM('peer', peerName, e.data); 
+                    }
+                } 
+                else if (e.data instanceof ArrayBuffer) {
+                    if (!incomingFileMeta) return;
+                    receivedBuffers.push(e.data);
+                    receivedSize += e.data.byteLength;
+                    
+                    const percent = Math.round((receivedSize / incomingFileMeta.size) * 100);
+                    updateProgress(`Receiving: ${incomingFileMeta.name} (${percent}%)`);
+
+                    if (receivedSize === incomingFileMeta.size) {
+                        const blob = new Blob(receivedBuffers, { type: incomingFileMeta.mime });
+                        const url = URL.createObjectURL(blob);
+                        appendFileDOM('peer', peerName, incomingFileMeta.name, url);
+                        saveMessage({ cssType: 'peer', displayName: peerName, text: url, fileName: incomingFileMeta.name, isFile: true });
+                        hideProgress();
+                        incomingFileMeta = null; receivedBuffers = [];
+                    }
+                }
+            };
+
+            dataChannel.onclose = () => logSystem("Disconnected.");
+        }
+
+        // --- Chat Functions ---
+        function sendMsg() {
+            const msg = document.getElementById('msg-input').value.trim();
+            if (msg && dataChannel?.readyState === "open") {
+                dataChannel.send(JSON.stringify({ type: 'chat', text: msg }));
+                appendMessageDOM('you', myName, msg);
+                saveMessage({ cssType: 'you', displayName: myName, text: msg, isFile: false });
+                document.getElementById('msg-input').value = "";
+            }
+        }
+
+        document.getElementById('send-btn').addEventListener('click', sendMsg);
+        document.getElementById('msg-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
+        
+        // --- File Functions ---
+        document.getElementById('attach-btn').addEventListener('click', () => document.getElementById('file-input').click());
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || dataChannel?.readyState !== "open") return;
+
+            dataChannel.send(JSON.stringify({ type: 'file-meta', name: file.name, size: file.size, mime: file.type }));
+            
+            const chunkSize = 65536; let offset = 0;
+            dataChannel.bufferedAmountLowThreshold = 1024 * 1024 * 2;
+
+            while (offset < file.size) {
+                if (dataChannel.readyState !== 'open') return;
+                if (dataChannel.bufferedAmount > 1024 * 1024 * 8) {
+                    await new Promise(resolve => {
+                        const onLow = () => { dataChannel.removeEventListener('bufferedamountlow', onLow); resolve(); };
+                        dataChannel.addEventListener('bufferedamountlow', onLow);
+                    });
+                }
+                const chunk = await file.slice(offset, offset + chunkSize).arrayBuffer();
+                dataChannel.send(chunk);
+                offset += chunk.byteLength;
+                
+                updateProgress(`Sending: ${file.name} (${Math.round((offset / file.size) * 100)}%)`);
+            }
+
+            hideProgress();
+            const localUrl = URL.createObjectURL(file);
+            appendFileDOM('you', myName, file.name, localUrl);
+            saveMessage({ cssType: 'you', displayName: myName, text: localUrl, fileName: file.name, isFile: true });
+            e.target.value = '';
+        });
+
+        // --- UI Rendering ---
+        const chatBox = document.getElementById('chat-box');
+        const progText = document.getElementById('progress-text');
+
+        function updateProgress(text) { progText.style.display = 'block'; progText.innerText = text; }
+        function hideProgress() { setTimeout(() => progText.style.display = 'none', 1000); }
+
+        function appendMessageDOM(cssType, displayName, text) {
+            const div = document.createElement('div');
+            div.className = 'msg';
+            div.innerHTML = `<span class="sender ${cssType}">${displayName}:</span> ${text}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendFileDOM(cssType, displayName, fileName, url) {
+            const div = document.createElement('div');
+            div.className = 'msg';
+            div.innerHTML = `<span class="sender ${cssType}">${displayName}:</span> <a href="${url}" download="${fileName}" class="file-link">[FILE: ${fileName}]</a>`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function logSystem(text) {
+            const div = document.createElement('div');
+            div.className = 'msg system'; div.innerText = `— ${text} —`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
