@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coded Projects</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            justify-content: center;
+            padding: 12vh 6vw;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 5rem;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: var(--text-main);
+            text-transform: lowercase;
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3.5rem;
+        }
+
+        .project-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .project-link {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            transition: opacity 0.2s ease;
+        }
+
+        .project-link:hover {
+            opacity: 0.6;
+        }
+
+        .project-link::after {
+            content: "↗";
+            font-size: 0.9rem;
+            margin-left: 6px;
+            opacity: 0.5;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .project-link:hover::after {
+            transform: translate(2px, -2px);
+            opacity: 1;
+        }
+
+        .project-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Subtle selection color */
+        ::selection {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>vibe coded projects.</h1>
+        </header>
+
+        <main class="project-list">
+            
+            <article class="project-item">
+                <a href="https://1bit.sbs/Project%20Marsupium/" target="_blank" rel="noopener noreferrer" class="project-link">Project Marsupium</a>
+                <p class="project-desc">This tool creates 100% normal-looking media files containing encrypted text.</p>
+            </article>
+
+            <article class="project-item">
+                <a href="https://1bit.sbs/PHM/" target="_blank" rel="noopener noreferrer" class="project-link">Project Handshake (Multi)</a>
+                <p class="project-desc">P2P Chat & File sharing. No server, directly device to device.</p>
+            </article>
+
+            <article class="project-item">
+                <a href="https://1bit.sbs/PHVC/" target="_blank" rel="noopener noreferrer" class="project-link">Project Handshake VoiceCall</a>
+                <p class="project-desc">P2P voice call with high quality audio and call recording features.</p>
+            </article>
+
+        </main>
+    </div>
+
+</body>
+</html>
