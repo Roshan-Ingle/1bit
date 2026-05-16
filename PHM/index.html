@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Project Handshake</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Pure Black, Minimalist Theme */
+        body, html {
+            margin: 0; padding: 0;
+            background-color: #000000; color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            height: 100dvh; width: 100vw;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; box-sizing: border-box;
+        }
+
+        *, *:before, *:after { box-sizing: border-box; }
+
+        /* Screen Controller */
+        .screen { 
+            display: none; width: 100%; max-width: 400px; 
+            padding: 20px; padding-bottom: max(20px, env(safe-area-inset-bottom)); 
+            text-align: center; height: 100%; flex-direction: column; justify-content: center;
+        }
+        .screen.active { display: flex; }
+
+        /* Typography & Labels */
+        .label { font-size: 12px; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .label.red { color: #ff3b30; }
+        .label.blue { color: #0a84ff; }
+
+        /* Inputs & Textareas */
+        textarea, input[type="text"] {
+            width: 100%; background: #000000; border: 1px solid #333333;
+            color: #ffffff; padding: 12px; font-family: monospace; font-size: 12px;
+            resize: none; outline: none; border-radius: 0; 
+        }
+        textarea { height: 90px; word-break: break-all; }
+        textarea.red-string { color: #ff3b30; border-color: rgba(255, 59, 48, 0.3); }
+        textarea.blue-string { color: #0a84ff; border-color: rgba(10, 132, 255, 0.3); }
+        textarea:focus, input[type="text"]:focus { border-color: #ffffff; }
+
+        /* Buttons */
+        button {
+            width: 100%; background: #ffffff; color: #000000; border: none; padding: 14px;
+            font-size: 14px; font-weight: 500; font-family: 'Inter', sans-serif; cursor: pointer;
+            border-radius: 0; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.2s;
+        }
+        button:active { opacity: 0.7; }
+        button:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        /* Screen 3: Chat Interface */
+        #screen-chat { 
+            max-width: 600px; justify-content: flex-start; 
+            padding-top: max(20px, env(safe-area-inset-top)); 
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex; justify-content: space-between; width: 100%; margin-bottom: 15px; flex-shrink: 0;
+        }
+        .icon-btn {
+            background: transparent; border: 1px solid #333; color: #888; padding: 6px 12px;
+            font-family: monospace; font-size: 12px; cursor: pointer; text-transform: uppercase; width: auto;
+        }
+        .icon-btn:active { background: #222; }
+        .icon-btn:hover { color: #fff; border-color: #888; }
+        .icon-btn.red-hover:hover { color: #ff3b30; border-color: rgba(255, 59, 48, 0.5); }
+
+        #chat-view-container { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        
+        #chat-box {
+            flex: 1; overflow-y: auto; text-align: left;
+            display: flex; flex-direction: column; gap: 12px;
+            margin-bottom: 12px; font-size: 14px;
+            scrollbar-width: none; min-height: 0; width: 100%;
+        }
+        #chat-box::-webkit-scrollbar { display: none; }
+        
+        .msg { line-height: 1.5; word-wrap: break-word; width: 100%; }
+        .msg span.sender { font-weight: 500; margin-right: 8px; }
+        .msg span.sender.you { color: #888888; }
+        .msg span.sender.peer { color: #ffffff; }
+        .msg.system { color: #555555; font-size: 12px; text-align: center; font-style: italic; }
+        .file-link { color: #ffffff; text-decoration: underline; font-family: monospace; }
+
+        /* Progress Area */
+        #progress-area { 
+            display: none; align-items: center; justify-content: flex-start; 
+            font-size: 11px; color: #888; margin-bottom: 12px; font-family: monospace; 
+            border: 1px dashed #333; padding: 8px 12px; flex-shrink: 0; width: 100%;
+        }
+        #progress-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+
+        /* Input Area */
+        .input-row { display: flex; gap: 10px; width: 100%; flex-shrink: 0; }
+        .input-row input { flex: 1; min-width: 0; } 
+        .input-row button { width: auto; padding: 0 20px; flex-shrink: 0; }
+        #attach-btn { background: #222; color: #fff; padding: 0 15px; }
+
+        /* Host Add Guest Panel */
+        #host-add-panel { display: none; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: Identity & Role -->
+    <div id="screen-1" class="screen active">
+        <div>
+            <div class="label">Identity</div>
+            <input type="text" id="nickname-input" placeholder="Enter Nickname..." autocomplete="off" style="text-align: center; font-family: 'Inter', sans-serif;">
+        </div>
+        <div style="margin-top: 10px;">
+            <div class="label" style="margin-bottom: 12px;">Select Role</div>
+            <button id="btn-host">Create Hub (Host)</button>
+            <button id="btn-guest" style="margin-top: 12px;">Join Hub (Guest)</button>
+        </div>
+    </div>
+
+    <!-- SCREEN: GUEST SIGNALING -->
+    <div id="screen-guest-signaling" class="screen">
+        <div>
+            <div class="label red">Your String (Red)</div>
+            <textarea id="guest-red" class="red-string" readonly placeholder="Generating..."></textarea>
+            <button id="guest-copy-red" style="margin-top: 10px;">Copy & Give To Host</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <div class="label blue">Paste Host's Reply (Blue)</div>
+            <textarea id="guest-blue" class="blue-string" placeholder="Paste blue string here..."></textarea>
+            <button id="guest-connect" style="margin-top: 10px;">Connect to Hub</button>
+        </div>
+    </div>
+
+    <!-- SCREEN: MAIN CHAT (Used by Host and Guests) -->
+    <div id="screen-chat" class="screen">
+        
+        <div class="top-bar">
+            <button id="add-guest-btn" class="icon-btn" style="display:none;">+ Add Guest</button>
+            <div style="flex:1"></div>
+            <button id="clear-chat-btn" class="icon-btn red-hover" title="Clear History (All)">[ X ]</button>
+        </div>
+
+        <!-- Chat View -->
+        <div id="chat-view-container">
+            <div id="chat-box"></div>
+            
+            <div id="progress-area">
+                <span id="progress-text"></span>
+            </div>
+
+            <div class="input-row">
+                <input type="file" id="file-input" style="display:none;">
+                <button id="attach-btn">+</button>
+                <input type="text" id="msg-input" placeholder="Message group..." autocomplete="off">
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+
+        <!-- Host Add Guest Overlay Panel -->
+        <div id="host-add-panel">
+            <div class="label red">1. Paste Guest String (Red)</div>
+            <textarea id="host-guest-string" class="red-string" placeholder="Paste guest red string..."></textarea>
+            <button id="host-process-btn">Process Guest</button>
+
+            <div style="margin-top: 20px;">
+                <div class="label blue">2. Give Reply to Guest (Blue)</div>
+                <textarea id="host-reply-string" class="blue-string" readonly placeholder="Waiting for processing..."></textarea>
+                <button id="host-close-panel-btn" style="margin-top: 10px;">Copy & Return to Chat</button>
+            </div>
+            <button id="host-cancel-add-btn" class="icon-btn" style="margin-top: 15px; border:none; color:#555;">Cancel</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Global State ---
+        let myName = 'Anonymous';
+        let isHost = false;
+        
+        // Host uses array of connections, Guest uses a single connection
+        let hostPeers = []; 
+        let guestPC = null;
+        let guestDC = null;
+
+        const rtcConfig = { iceServers: [] }; 
+
+        // --- Navigation ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function setIdentity() {
+            const inputName = document.getElementById('nickname-input').value.trim();
+            if (inputName) myName = inputName;
+        }
+
+        // --- IndexedDB ---
+        let db;
+        const dbRequest = indexedDB.open("P2P_Minimal_Group_DB", 3);
+        dbRequest.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("messages")) db.createObjectStore("messages", { keyPath: "id", autoIncrement: true });
+        };
+        dbRequest.onsuccess = (e) => { db = e.target.result; loadMessagesFromDB(); };
+
+        function saveMessage(msgObj) {
+            if (!db) return;
+            db.transaction("messages", "readwrite").objectStore("messages").add(msgObj);
+        }
+
+        function loadMessagesFromDB() {
+            if (!db) return;
+            const req = db.transaction("messages", "readonly").objectStore("messages").getAll();
+            req.onsuccess = () => {
+                req.result.forEach(msg => {
+                    if (msg.isFile) appendFileDOM(msg.cssType, msg.displayName, msg.fileName, msg.text);
+                    else if (msg.isSystem) logSystem(msg.text, false);
+                    else appendMessageDOM(msg.cssType, msg.displayName, msg.text);
+                });
+            };
+        }
+
+        function clearLocalChatDB() {
+            if (db) {
+                const tx = db.transaction("messages", "readwrite");
+                tx.objectStore("messages").clear();
+                tx.oncomplete = () => {
+                    document.getElementById('chat-box').innerHTML = '';
+                    logSystem("Group chat history cleared.");
+                };
+            }
+        }
+
+        document.getElementById('clear-chat-btn').addEventListener('click', () => {
+            if (!confirm("Clear chat history for EVERYONE in the hub?")) return;
+            clearLocalChatDB();
+            broadcast({ type: 'clear-chat' });
+        });
+
+        // ==========================================
+        // HOST LOGIC (STAR TOPOLOGY ROUTER)
+        // ==========================================
+        document.getElementById('btn-host').addEventListener('click', () => {
+            isHost = true; setIdentity();
+            showScreen('screen-chat');
+            document.getElementById('add-guest-btn').style.display = 'block';
+            logSystem("Hub created. You are the Host. Click [+ Add Guest] to invite people.");
+        });
+
+        // Host Sub-UI Toggles
+        document.getElementById('add-guest-btn').addEventListener('click', () => {
+            document.getElementById('chat-view-container').style.display = 'none';
+            document.getElementById('host-add-panel').style.display = 'flex';
+            document.getElementById('host-guest-string').value = '';
+            document.getElementById('host-reply-string').value = '';
+        });
+
+        document.getElementById('host-cancel-add-btn').addEventListener('click', () => {
+            document.getElementById('host-add-panel').style.display = 'none';
+            document.getElementById('chat-view-container').style.display = 'flex';
+        });
+
+        // Host Processes Guest Offer
+        document.getElementById('host-process-btn').addEventListener('click', async () => {
+            try {
+                const offerStr = document.getElementById('host-guest-string').value.trim();
+                if (!offerStr) return;
+                
+                const offer = JSON.parse(atob(offerStr));
+                const pc = new RTCPeerConnection(rtcConfig);
+                const peerObj = { id: Date.now(), pc: pc, dc: null, name: 'Joining...' };
+                hostPeers.push(peerObj);
+
+                pc.ondatachannel = (e) => {
+                    peerObj.dc = e.channel;
+                    setupHostDataChannel(peerObj);
+                };
+
+                await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                pc.onicecandidate = (e) => {
+                    if (e.candidate === null) {
+                        document.getElementById('host-reply-string').value = btoa(JSON.stringify(pc.localDescription));
+                        document.getElementById('host-process-btn').innerText = "Processed";
+                    }
+                };
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+
+            } catch (err) { alert("Invalid Red String."); }
+        });
+
+        document.getElementById('host-close-panel-btn').addEventListener('click', () => {
+            const el = document.getElementById('host-reply-string');
+            el.select(); navigator.clipboard.writeText(el.value);
+            document.getElementById('host-add-panel').style.display = 'none';
+            document.getElementById('chat-view-container').style.display = 'flex';
+            document.getElementById('host-process-btn').innerText = "Process Guest";
+        });
+
+        function setupHostDataChannel(peer) {
+            peer.dc.binaryType = "arraybuffer";
+            
+            peer.dc.onopen = () => {
+                peer.dc.send(JSON.stringify({ type: 'set-name', name: myName }));
+            };
+
+            peer.dc.onmessage = (e) => {
+                if (typeof e.data === 'string') {
+                    try {
+                        const payload = JSON.parse(e.data);
+                        if (payload.type === 'set-name') {
+                            peer.name = payload.name;
+                            logSystem(`${peer.name} joined the hub.`);
+                            broadcast({ type: 'system', text: `${peer.name} joined the hub.` }, peer);
+                        } 
+                        else if (payload.type === 'chat') {
+                            appendMessageDOM('peer', peer.name, payload.text);
+                            saveMessage({ cssType: 'peer', displayName: peer.name, text: payload.text, isFile: false });
+                            // Relay to everyone else
+                            broadcast({ type: 'chat', senderName: peer.name, text: payload.text }, peer);
+                        }
+                        else if (payload.type === 'clear-chat') {
+                            clearLocalChatDB();
+                            broadcast(payload, peer); // Forward clear
+                        }
+                        else if (payload.type === 'file-meta') {
+                            incomingFileMeta = payload;
+                            incomingFileMeta.senderName = peer.name; // Tag sender
+                            receivedBuffers = []; receivedSize = 0;
+                            updateProgress(`Receiving: ${payload.name}`);
+                            broadcast(incomingFileMeta, peer); // Forward meta
+                        }
+                    } catch (err) { }
+                } 
+                else if (e.data instanceof ArrayBuffer) {
+                    // 1. Forward raw chunk to everyone else
+                    broadcastRaw(e.data, peer);
+                    
+                    // 2. Process locally for the Host's screen
+                    if (incomingFileMeta) processChunkLocally(e.data, incomingFileMeta);
+                }
+            };
+
+            peer.dc.onclose = () => {
+                logSystem(`${peer.name} disconnected.`);
+                broadcast({ type: 'system', text: `${peer.name} left the hub.` }, peer);
+                hostPeers = hostPeers.filter(p => p.id !== peer.id);
+            };
+        }
+
+
+        // ==========================================
+        // GUEST LOGIC
+        // ==========================================
+        document.getElementById('btn-guest').addEventListener('click', async () => {
+            isHost = false; setIdentity();
+            showScreen('screen-guest-signaling');
+            
+            guestPC = new RTCPeerConnection(rtcConfig);
+            guestDC = guestPC.createDataChannel("chat");
+            setupGuestDataChannel();
+
+            guestPC.onicecandidate = (e) => {
+                if (e.candidate === null) document.getElementById('guest-red').value = btoa(JSON.stringify(guestPC.localDescription));
+            };
+            const offer = await guestPC.createOffer();
+            await guestPC.setLocalDescription(offer);
+        });
+
+        document.getElementById('guest-copy-red').addEventListener('click', () => {
+            const el = document.getElementById('guest-red'); el.select(); navigator.clipboard.writeText(el.value);
+            document.getElementById('guest-copy-red').innerText = "Copied";
+        });
+
+        document.getElementById('guest-connect').addEventListener('click', async () => {
+            try {
+                const answerStr = document.getElementById('guest-blue').value.trim();
+                const answer = JSON.parse(atob(answerStr));
+                await guestPC.setRemoteDescription(new RTCSessionDescription(answer));
+                document.getElementById('guest-connect').innerText = "Connecting...";
+            } catch (err) { alert("Invalid Blue String."); }
+        });
+
+        function setupGuestDataChannel() {
+            guestDC.binaryType = "arraybuffer";
+            
+            guestDC.onopen = () => {
+                showScreen('screen-chat');
+                logSystem("Connected to Hub.");
+                guestDC.send(JSON.stringify({ type: 'set-name', name: myName }));
+            };
+
+            guestDC.onmessage = (e) => {
+                if (typeof e.data === 'string') {
+                    try {
+                        const payload = JSON.parse(e.data);
+                        if (payload.type === 'set-name') {
+                            logSystem(`Hub hosted by ${payload.name}`);
+                        }
+                        else if (payload.type === 'system') {
+                            logSystem(payload.text);
+                        }
+                        else if (payload.type === 'chat') {
+                            appendMessageDOM('peer', payload.senderName, payload.text);
+                            saveMessage({ cssType: 'peer', displayName: payload.senderName, text: payload.text, isFile: false });
+                        }
+                        else if (payload.type === 'clear-chat') {
+                            clearLocalChatDB();
+                        }
+                        else if (payload.type === 'file-meta') {
+                            incomingFileMeta = payload;
+                            receivedBuffers = []; receivedSize = 0;
+                            updateProgress(`Receiving: ${payload.name}`);
+                        }
+                    } catch (err) { }
+                } 
+                else if (e.data instanceof ArrayBuffer) {
+                    if (incomingFileMeta) processChunkLocally(e.data, incomingFileMeta);
+                }
+            };
+
+            guestDC.onclose = () => logSystem("Disconnected from Hub.");
+        }
+
+
+        // ==========================================
+        // SHARED ROUTING & MESSAGING LOGIC
+        // ==========================================
+        let incomingFileMeta = null;
+        let receivedBuffers = [];
+        let receivedSize = 0;
+
+        // Broadcast to all connected Hub peers (Used primarily by Host)
+        function broadcast(payloadObj, excludePeer = null) {
+            if (!isHost) {
+                if (guestDC && guestDC.readyState === 'open') guestDC.send(JSON.stringify(payloadObj));
+                return;
+            }
+            const str = JSON.stringify(payloadObj);
+            hostPeers.forEach(p => {
+                if (p !== excludePeer && p.dc && p.dc.readyState === 'open') p.dc.send(str);
+            });
+        }
+
+        function broadcastRaw(buffer, excludePeer = null) {
+            if (!isHost) {
+                if (guestDC && guestDC.readyState === 'open') guestDC.send(buffer);
+                return;
+            }
+            hostPeers.forEach(p => {
+                if (p !== excludePeer && p.dc && p.dc.readyState === 'open') p.dc.send(buffer);
+            });
+        }
+
+        function sendMsg() {
+            const msg = document.getElementById('msg-input').value.trim();
+            if (!msg) return;
+
+            appendMessageDOM('you', myName, msg);
+            saveMessage({ cssType: 'you', displayName: myName, text: msg, isFile: false });
+
+            broadcast({ type: 'chat', senderName: myName, text: msg });
+            document.getElementById('msg-input').value = "";
+        }
+
+        document.getElementById('send-btn').addEventListener('click', sendMsg);
+        document.getElementById('msg-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
+
+
+        // ==========================================
+        // SHARED FILE TRANSFER
+        // ==========================================
+        document.getElementById('attach-btn').addEventListener('click', () => document.getElementById('file-input').click());
+
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('attach-btn').disabled = true;
+            
+            // Broadcast Meta
+            broadcast({ type: 'file-meta', senderName: myName, name: file.name, size: file.size, mime: file.type });
+            updateProgress(`Sending: ${file.name}...`);
+
+            const chunkSize = 65536; let offset = 0;
+            const targetDC = isHost ? (hostPeers.length > 0 ? hostPeers[0].dc : null) : guestDC; // Just for buffer checks
+
+            while (offset < file.size) {
+                if (!isHost && (!guestDC || guestDC.readyState !== 'open')) break;
+                
+                // Backpressure protection (only reliable on single-channel or checking primary channel)
+                if (targetDC && targetDC.bufferedAmount > 1024 * 1024 * 8) {
+                    await new Promise(resolve => {
+                        const onLow = () => { targetDC.removeEventListener('bufferedamountlow', onLow); resolve(); };
+                        targetDC.addEventListener('bufferedamountlow', onLow);
+                    });
+                }
+                
+                const chunk = await file.slice(offset, offset + chunkSize).arrayBuffer();
+                broadcastRaw(chunk); // Blast chunk to network
+                offset += chunk.byteLength;
+                
+                updateProgress(`Sending: ${file.name} (${Math.round((offset / file.size) * 100)}%)`);
+            }
+
+            if (offset >= file.size) {
+                const localUrl = URL.createObjectURL(file);
+                appendFileDOM('you', myName, file.name, localUrl);
+                saveMessage({ cssType: 'you', displayName: myName, text: localUrl, fileName: file.name, isFile: true });
+            }
+
+            hideProgress();
+            document.getElementById('attach-btn').disabled = false;
+            e.target.value = '';
+        });
+
+        function processChunkLocally(chunk, meta) {
+            receivedBuffers.push(chunk); 
+            receivedSize += chunk.byteLength;
+            
+            const percent = Math.round((receivedSize / meta.size) * 100);
+            updateProgress(`Receiving: ${meta.name} (${percent}%)`);
+
+            if (receivedSize === meta.size) {
+                const blob = new Blob(receivedBuffers, { type: meta.mime });
+                const url = URL.createObjectURL(blob);
+                const sender = meta.senderName || 'Peer';
+                
+                appendFileDOM('peer', sender, meta.name, url);
+                saveMessage({ cssType: 'peer', displayName: sender, text: url, fileName: meta.name, isFile: true });
+                
+                hideProgress();
+                incomingFileMeta = null; receivedBuffers = []; receivedSize = 0;
+            }
+        }
+
+
+        // ==========================================
+        // UI RENDERING
+        // ==========================================
+        const chatBox = document.getElementById('chat-box');
+        const progArea = document.getElementById('progress-area');
+        const progText = document.getElementById('progress-text');
+
+        function updateProgress(text) { 
+            progArea.style.display = 'flex'; 
+            progText.innerText = text; 
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function hideProgress() { 
+            setTimeout(() => progArea.style.display = 'none', 1000); 
+        }
+
+        function appendMessageDOM(cssType, displayName, text) {
+            const div = document.createElement('div'); div.className = 'msg';
+            div.innerHTML = `<span class="sender ${cssType}">${displayName}:</span> ${text}`;
+            chatBox.appendChild(div); chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendFileDOM(cssType, displayName, fileName, url) {
+            const div = document.createElement('div'); div.className = 'msg';
+            div.innerHTML = `<span class="sender ${cssType}">${displayName}:</span> <a href="${url}" download="${fileName}" class="file-link">[FILE: ${fileName}]</a>`;
+            chatBox.appendChild(div); chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function logSystem(text, save = true) {
+            const div = document.createElement('div'); div.className = 'msg system'; div.innerText = `— ${text} —`;
+            chatBox.appendChild(div); chatBox.scrollTop = chatBox.scrollHeight;
+            if (save) saveMessage({ isSystem: true, text: text });
+        }
+    </script>
+</body>
+</html>
