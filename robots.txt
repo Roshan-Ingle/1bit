@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /GWP/
+Allow: /Projects/
+Allow: /Project%20Marsupium/
+Allow: /PHM/
+Allow: /PHVC/
+
+# Sitemap ka link jo crawlers ko rasta dikhaega
+Sitemap: https://1bit.sbs/sitemap.xml
